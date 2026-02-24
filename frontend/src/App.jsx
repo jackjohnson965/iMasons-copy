@@ -23,6 +23,7 @@ function App() {
               <Route path="/student/profile/new" element={<StudentProfilePage />} />
               <Route path="/student/profile/:id" element={<StudentProfilePage />} />
               <Route path="/student/profile/:id/view" element={<StudentProfileViewPage />} />
+              <Route path="/student/dashboard" element={<StudentDashboardPage />} />
               <Route path="/student/dashboard/:id" element={<StudentDashboardPage />} />
               <Route path="/students" element={<StudentListPage />} />
               <Route path="/jobs" element={<JobListPage />} />
