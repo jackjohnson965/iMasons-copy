@@ -8,7 +8,7 @@ export default function HomePage() {
   const handleRoleSelect = (selectedRole) => {
     setRole(selectedRole);
     if (selectedRole === 'student') {
-      navigate('/jobs');
+      navigate('/student/dashboard');
     } else {
       navigate('/employer/dashboard');
     }
