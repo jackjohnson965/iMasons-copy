@@ -10,8 +10,10 @@ import StudentProfileViewPage from './pages/StudentProfileViewPage';
 import StudentDashboardPage from './pages/StudentDashboardPage';
 import StudentListPage from './pages/StudentListPage';
 import JobListPage from './pages/JobListPage';
+import MentorListPage from './pages/MentorListPage';
 import JobDetailPage from './pages/JobDetailPage';
 import JobCreatePage from './pages/JobCreatePage';
+import MentorCreatePage from './pages/MentorCreatePage';
 import EmployerDashboardPage from './pages/EmployerDashboardPage';
 import AdminDashboardPage from './pages/AdminDashboardPage';
 
@@ -36,6 +38,8 @@ function App() {
               <Route path="/student/dashboard/:id" element={<ProtectedRoute><StudentDashboardPage /></ProtectedRoute>} />
               <Route path="/students" element={<ProtectedRoute><StudentListPage /></ProtectedRoute>} />
               <Route path="/jobs" element={<ProtectedRoute><JobListPage /></ProtectedRoute>} />
+              <Route path="/mentors" element={<ProtectedRoute><MentorListPage /></ProtectedRoute>} />
+              <Route path="/mentors/new" element={<ProtectedRoute><MentorCreatePage /></ProtectedRoute>} />
               <Route path="/jobs/new" element={<ProtectedRoute><JobCreatePage /></ProtectedRoute>} />
               <Route path="/jobs/:id" element={<ProtectedRoute><JobDetailPage /></ProtectedRoute>} />
               <Route path="/jobs/:id/edit" element={<ProtectedRoute><JobCreatePage /></ProtectedRoute>} />

@@ -30,12 +30,17 @@ export default function Navbar() {
                 Jobs
               </Link>
               <Link
+                to="/mentors"
+                className="text-gray-600 hover:text-brand-purple transition-colors"
+              >
+                Mentors
+              </Link>
+              <Link
                 to="/students"
                 className="text-gray-600 hover:text-brand-purple transition-colors"
               >
                 Students
               </Link>
-
               {isStudent && linkedProfileId && (
                 <>
                   <Link
@@ -66,6 +71,12 @@ export default function Navbar() {
                     className="text-gray-600 hover:text-brand-purple transition-colors"
                   >
                     Post Job
+                  </Link>
+                  <Link
+                    to="/mentors/new"
+                    className="text-gray-600 hover:text-brand-purple transition-colors"
+                  >
+                    Post Mentorship
                   </Link>
                 </>
               )}

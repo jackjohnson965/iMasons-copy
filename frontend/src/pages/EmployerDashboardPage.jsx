@@ -132,12 +132,20 @@ export default function EmployerDashboardPage() {
             <p className="text-gray-500">{employer.contactEmail}</p>
           </div>
         </div>
-        <Link
-          to="/jobs/new"
-          className="bg-brand-purple text-white px-4 py-2 rounded-lg hover:bg-brand-purple-dark transition-colors"
-        >
-          + New Posting
-        </Link>
+        <div className="flex gap-2">
+          <Link
+            to="/jobs/new"
+            className="bg-brand-purple text-white px-4 py-2 rounded-lg hover:bg-brand-purple-dark transition-colors"
+          >
+            + New Posting
+          </Link>
+          <Link
+            to="/mentors/new"
+            className="bg-brand-purple text-white px-4 py-2 rounded-lg hover:bg-brand-purple-dark transition-colors"
+          >
+            + New Mentorship
+          </Link>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
@@ -183,9 +191,9 @@ export default function EmployerDashboardPage() {
       </h2>
       {postingsLoading ? (
         <p className="text-gray-500">Loading postings...</p>
-      ) : postings?.length > 0 ? (
+      ) : postings?.filter(p=>p.jobType!=='mentorship').length > 0 ? (
         <div className="space-y-3">
-          {postings.map((p) => {
+          {postings.filter(p=>p.jobType!=='mentorship').map((p) => {
             const statusColors = {
               active: 'text-green-600',
               closed: 'text-red-500',
@@ -228,7 +236,61 @@ export default function EmployerDashboardPage() {
           })}
         </div>
       ) : (
-        <p className="text-gray-400 py-8 text-center">No postings yet. Create your first job posting!</p>
+        <p className="text-gray-400 py-8 text-center">No job postings yet. Create your first job posting!</p>
+      )}
+
+      <h2 className="text-xl font-semibold text-gray-900 mb-4 mt-8 flex items-center gap-2">
+        <img src="/images/handshake-icon.png" alt="Mentorships" className="h-6 w-6 object-contain" />
+        My Mentorships
+      </h2>
+      {postingsLoading ? (
+        <p className="text-gray-500">Loading postings...</p>
+      ) : postings?.filter(p=>p.jobType==='mentorship').length > 0 ? (
+        <div className="space-y-3">
+          {postings.filter(p=>p.jobType==='mentorship').map((p) => {
+            const statusColors = {
+              active: 'text-green-600',
+              closed: 'text-red-500',
+              archived: 'text-gray-500',
+            };
+            return (
+              <div
+                key={p.id}
+                className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 flex items-center justify-between"
+              >
+                <div>
+                  <Link to={`/jobs/${p.id}`} className="font-medium text-gray-900 hover:text-blue-600">
+                    {p.title}
+                  </Link>
+                  <div className="text-sm text-gray-500 mt-1">
+                    {p.jobType} {p.location && `- ${p.location}`}
+                    <span className={`ml-2 capitalize ${statusColors[p.status] || ''}`}>
+                      ({p.status})
+                    </span>
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <Link
+                    to={`/jobs/${p.id}/edit`}
+                    className="text-sm text-blue-600 hover:text-blue-800"
+                  >
+                    Edit
+                  </Link>
+                  {p.status === 'active' && (
+                    <button
+                      onClick={() => handleDeactivate(p.id)}
+                      className="text-sm text-red-500 hover:text-red-700"
+                    >
+                      Close
+                    </button>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      ) : (
+        <p className="text-gray-400 py-8 text-center">No mentorships yet. Create your first mentorship posting!</p>
       )}
     </div>
   );

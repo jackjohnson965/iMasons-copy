@@ -4,6 +4,7 @@ from database import engine, Base
 from routers import students, employers, jobPostings, savedPostings, analytics
 from routers import auth as auth_router
 from routers import admin as admin_router
+from routers import mentors  # new mentor/mentorship endpoints
 
 # Create all tables that don't exist yet (safe to call repeatedly)
 Base.metadata.create_all(bind=engine)
@@ -26,6 +27,7 @@ app.add_middleware(
 app.include_router(students.router)
 app.include_router(employers.router)
 app.include_router(jobPostings.router)
+app.include_router(mentors.router)  # mentorship-specific endpoints
 app.include_router(savedPostings.router)
 app.include_router(analytics.router)
 

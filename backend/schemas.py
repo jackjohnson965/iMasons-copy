@@ -162,6 +162,20 @@ class JobPostingCreate(BaseModel):
     customQuestions: list[CustomQuestionCreate] = []
 
 
+# input for mentorships is identical to JobPostingCreate except that jobType
+# is always mentorship and therefore not part of the payload. this makes the
+# frontend simpler (no hidden/select field) and avoids validation errors when
+# posting to /api/mentors.
+class MentorPostingCreate(BaseModel):
+    employerId: int
+    title: str
+    description: str
+    location: str = ""
+    industry: str = ""
+    status: str = "active"      # active | closed | archived
+    customQuestions: list[CustomQuestionCreate] = []
+
+
 class JobPostingUpdate(BaseModel):
     title: Optional[str] = None
     description: Optional[str] = None
