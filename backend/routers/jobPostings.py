@@ -15,6 +15,10 @@ def create_job_posting(posting: JobPostingCreate, db: Session = Depends(get_db))
     if not employer:
         raise HTTPException(status_code=404, detail="Employer not found")
 
+    # Validate status value
+    if posting.status not in ("active", "closed", "archived"):
+        raise HTTPException(status_code=422, detail="status must be 'active', 'closed', or 'archived'")
+
     db_posting = JobPosting(
         employerId=posting.employerId,
         title=posting.title,
@@ -22,6 +26,8 @@ def create_job_posting(posting: JobPostingCreate, db: Session = Depends(get_db))
         location=posting.location,
         jobType=posting.jobType,
         industry=posting.industry,
+        status=posting.status,
+        isActive=1 if posting.status == "active" else 0,
     )
     db.add(db_posting)
     db.flush()
@@ -45,14 +51,25 @@ def list_job_postings(
     location: Optional[str] = Query(None),
     jobType: Optional[str] = Query(None),
     industry: Optional[str] = Query(None),
-    isActive: Optional[int] = Query(None),
+    status: Optional[str] = Query(None),      # replaces isActive; values: active | closed | archived
+    isActive: Optional[int] = Query(None),     # legacy support — prefer `status`
     employerId: Optional[int] = Query(None),
     db: Session = Depends(get_db),
 ):
-    """List job postings with optional search and filters."""
+    """
+    List job postings with optional search and filters.
+    Use `status` parameter (active/closed/archived) for filtering.
+    Legacy `isActive` parameter is still supported for backward compatibility.
+    """
     query = db.query(JobPosting)
-    if isActive is not None:
+
+    # Prefer status filter over legacy isActive
+    if status is not None:
+        query = query.filter(JobPosting.status == status)
+    elif isActive is not None:
+        # Convert legacy isActive to status filter
         query = query.filter(JobPosting.isActive == isActive)
+
     if employerId is not None:
         query = query.filter(JobPosting.employerId == employerId)
     if location:
@@ -85,12 +102,23 @@ def get_job_posting(posting_id: int, db: Session = Depends(get_db)):
 
 @router.put("/{posting_id}", response_model=JobPostingResponse)
 def update_job_posting(posting_id: int, updates: JobPostingUpdate, db: Session = Depends(get_db)):
-    """Update a job posting."""
+    """Update a job posting. When updating status, isActive is kept in sync automatically."""
     posting = db.query(JobPosting).filter(JobPosting.id == posting_id).first()
     if not posting:
         raise HTTPException(status_code=404, detail="Job posting not found")
-    for key, value in updates.model_dump(exclude_unset=True).items():
+
+    update_data = updates.model_dump(exclude_unset=True)
+
+    # When status is updated, sync the legacy isActive field
+    if "status" in update_data:
+        new_status = update_data["status"]
+        if new_status not in ("active", "closed", "archived"):
+            raise HTTPException(status_code=422, detail="status must be 'active', 'closed', or 'archived'")
+        update_data["isActive"] = 1 if new_status == "active" else 0
+
+    for key, value in update_data.items():
         setattr(posting, key, value)
+
     db.commit()
     db.refresh(posting)
     return posting
@@ -98,10 +126,11 @@ def update_job_posting(posting_id: int, updates: JobPostingUpdate, db: Session =
 
 @router.delete("/{posting_id}")
 def deactivate_job_posting(posting_id: int, db: Session = Depends(get_db)):
-    """Deactivate a job posting (soft delete)."""
+    """Close a job posting (soft delete — sets status to 'closed')."""
     posting = db.query(JobPosting).filter(JobPosting.id == posting_id).first()
     if not posting:
         raise HTTPException(status_code=404, detail="Job posting not found")
-    posting.isActive = 0
+    posting.status = "closed"
+    posting.isActive = 0  # keep legacy field in sync
     db.commit()
-    return {"message": "Job posting deactivated"}
+    return {"message": "Job posting closed"}

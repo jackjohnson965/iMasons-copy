@@ -6,7 +6,7 @@ import { api } from '../api';
 
 export default function JobDetailPage() {
   const { id } = useParams();
-  const { isStudent, userId, role } = useRole();
+  const { isStudent, linkedProfileId, role } = useRole();
   const { data: job, loading } = useFetch(`/job-postings/${id}`);
   const { data: employer } = useFetch(job ? `/employers/${job.employerId}` : null);
 
@@ -22,11 +22,25 @@ export default function JobDetailPage() {
 
   const handleSave = async () => {
     try {
-      await api.post('/saved-postings', { studentId: userId, jobPostingId: Number(id) });
+      await api.post('/saved-postings', { studentId: linkedProfileId, jobPostingId: Number(id) });
       alert('Job saved!');
     } catch {
       alert('Already saved or error occurred');
     }
+  };
+
+  /** Log an email_click event and open the employer's email */
+  const handleApplyEmail = () => {
+    // Log the click as an analytics event
+    api.post('/analytics/events', {
+      eventType: 'email_click',
+      targetId: Number(id),
+      viewerRole: role,
+    }).catch(() => {});
+
+    // Open the user's email client
+    const subject = encodeURIComponent(`Application Inquiry: ${job.title}`);
+    window.location.href = `mailto:${employer.contactEmail}?subject=${subject}`;
   };
 
   if (loading) return <div className="text-center py-12 text-gray-500">Loading...</div>;
@@ -37,6 +51,12 @@ export default function JobDetailPage() {
     'full-time': 'bg-green-100 text-green-800',
     'part-time': 'bg-yellow-100 text-yellow-800',
     mentorship: 'bg-purple-100 text-purple-800',
+  };
+
+  const statusColors = {
+    active: 'bg-green-100 text-green-800',
+    closed: 'bg-red-100 text-red-800',
+    archived: 'bg-gray-100 text-gray-600',
   };
 
   return (
@@ -52,9 +72,16 @@ export default function JobDetailPage() {
               <p className="text-gray-600 mt-1">{employer.companyName}</p>
             )}
           </div>
-          <span className={`px-3 py-1 rounded-full text-sm font-medium ${typeColors[job.jobType] || 'bg-gray-100 text-gray-800'}`}>
-            {job.jobType}
-          </span>
+          <div className="flex gap-2">
+            <span className={`px-3 py-1 rounded-full text-sm font-medium ${typeColors[job.jobType] || 'bg-gray-100 text-gray-800'}`}>
+              {job.jobType}
+            </span>
+            {job.status && job.status !== 'active' && (
+              <span className={`px-3 py-1 rounded-full text-sm font-medium capitalize ${statusColors[job.status] || ''}`}>
+                {job.status}
+              </span>
+            )}
+          </div>
         </div>
 
         <div className="flex gap-4 text-sm text-gray-500 mb-6">
@@ -91,14 +118,22 @@ export default function JobDetailPage() {
           </div>
         )}
 
-        {isStudent && userId && (
-          <div className="mt-6">
+        {isStudent && linkedProfileId && (
+          <div className="mt-6 flex gap-3">
             <button
               onClick={handleSave}
               className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 font-medium"
             >
               Save for Later
             </button>
+            {employer?.contactEmail && job.status === 'active' && (
+              <button
+                onClick={handleApplyEmail}
+                className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 font-medium"
+              >
+                Apply via Email
+              </button>
+            )}
           </div>
         )}
       </div>

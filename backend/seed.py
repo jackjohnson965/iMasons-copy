@@ -1,13 +1,14 @@
 """Seed the database with sample data for demo purposes."""
 from database import SessionLocal, engine, Base
-from models import Student, Employer, JobPosting, CustomQuestion, AnalyticsEvent
+from models import Student, Employer, JobPosting, CustomQuestion, AnalyticsEvent, User
+from auth import hash_password
 
 Base.metadata.create_all(bind=engine)
 
 db = SessionLocal()
 
-# Clear existing data
-for model in [AnalyticsEvent, CustomQuestion, JobPosting, Student, Employer]:
+# Clear existing data in dependency order
+for model in [AnalyticsEvent, CustomQuestion, JobPosting, User, Student, Employer]:
     db.query(model).delete()
 db.commit()
 
@@ -84,11 +85,47 @@ for pd in postings_data:
         employerId=employers[pd["employer"]].id,
         title=pd["title"], description=pd["desc"],
         location=pd["location"], jobType=pd["jobType"], industry=pd["industry"],
+        status="active", isActive=1,
     )
     db.add(posting)
     db.flush()
     for i, q in enumerate(pd["questions"]):
         db.add(CustomQuestion(jobPostingId=posting.id, questionText=q, questionOrder=i))
+
+# --- User accounts for authentication ---
+# Default password for all demo accounts: "Demo1234!"
+# In production, each user sets their own password at registration.
+
+DEMO_PASSWORD = "Demo1234!"
+
+# Student user accounts (STU-0001 through STU-0005)
+for i, student in enumerate(students):
+    db.add(User(
+        email=student.email,
+        hashedPassword=hash_password(DEMO_PASSWORD),
+        role="student",
+        imasonsIdentifier=f"STU-{1001 + i:04d}",
+        linkedProfileId=student.id,
+    ))
+
+# Employer user accounts (EMP-0001 through EMP-0003)
+for i, employer in enumerate(employers):
+    db.add(User(
+        email=employer.contactEmail,
+        hashedPassword=hash_password(DEMO_PASSWORD),
+        role="employer",
+        imasonsIdentifier=f"EMP-{1001 + i:04d}",
+        linkedProfileId=employer.id,
+    ))
+
+# Admin account
+db.add(User(
+    email="admin@imasons.org",
+    hashedPassword=hash_password(DEMO_PASSWORD),
+    role="admin",
+    imasonsIdentifier="ADM-0001",
+    linkedProfileId=None,
+))
 
 # Sample analytics events
 import random
@@ -97,9 +134,16 @@ all_students_db = db.query(Student).all()
 for posting in all_postings:
     for _ in range(random.randint(2, 15)):
         db.add(AnalyticsEvent(eventType="posting_view", targetId=posting.id, viewerRole="student"))
+    # Add some sample email_click events
+    for _ in range(random.randint(0, 4)):
+        db.add(AnalyticsEvent(eventType="email_click", targetId=posting.id, viewerRole="student"))
 for student in all_students_db:
     for _ in range(random.randint(1, 8)):
         db.add(AnalyticsEvent(eventType="profile_view", targetId=student.id, viewerRole="employer"))
+
+# Store emails before closing the session (ORM objects expire after close)
+student_emails = [s.email for s in students]
+employer_emails = [e.contactEmail for e in employers]
 
 db.commit()
 db.close()
@@ -108,4 +152,15 @@ print("Database seeded successfully!")
 print(f"  - {len(students)} students")
 print(f"  - {len(employers)} employers")
 print(f"  - {len(postings_data)} job postings")
-print("  - Sample analytics events")
+print(f"  - {len(students) + len(employers) + 1} user accounts")
+print("  - Sample analytics events (including email_click events)")
+print("")
+print("Demo login credentials (all accounts use password: Demo1234!)")
+print("  Students:")
+for i, email in enumerate(student_emails):
+    print(f"    {email}  |  iMasons ID: STU-{1001 + i:04d}")
+print("  Employers:")
+for i, email in enumerate(employer_emails):
+    print(f"    {email}  |  iMasons ID: EMP-{1001 + i:04d}")
+print("  Admin:")
+print("    admin@imasons.org  |  iMasons ID: ADM-0001")
