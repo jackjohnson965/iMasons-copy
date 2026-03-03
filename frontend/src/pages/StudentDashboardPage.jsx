@@ -9,10 +9,10 @@ import StatCard from '../components/StatCard';
 export default function StudentDashboardPage() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { userId, setUserId } = useRole();
-  const [showSetup, setShowSetup] = useState(!id && !userId);
+  const { userId, linkedProfileId, setLinkedProfileId, setAuth, token, role } = useRole();
+  const [showSetup, setShowSetup] = useState(!id && !linkedProfileId);
 
-  const studentId = id || userId;
+  const studentId = id || linkedProfileId;
   const { data: student, loading: studentLoading } = useFetch(studentId ? `/students/${studentId}` : null);
   const { data: saved, loading: savedLoading, refetch: refetchSaved } = useFetch(studentId ? `/saved-postings?studentId=${studentId}` : null);
   const { data: analytics } = useFetch(studentId ? `/analytics/student/${studentId}` : null);
@@ -42,7 +42,9 @@ export default function StudentDashboardPage() {
     setSetupLoading(true);
     try {
       const stu = await api.post('/students', setupForm);
-      setUserId(stu.id);
+      // Link the newly created student profile to the authenticated user
+      const linkRes = await api.post(`/auth/link-profile/${stu.id}`, {});
+      setAuth(linkRes);
       setShowSetup(false);
       navigate(`/student/dashboard/${stu.id}`);
     } catch (err) {
@@ -208,6 +210,25 @@ export default function StudentDashboardPage() {
         <StatCard label="Saved Jobs" value={saved?.length ?? 0} />
         <StatCard label="Status" value={student.isActive ? 'Active' : 'Inactive'} />
       </div>
+
+      {/* Who Viewed My Profile — surfaces profile_view analytics */}
+      {analytics?.recentViews?.length > 0 && (
+        <div className="mb-8">
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">Recent Profile Views</h2>
+          <div className="bg-white rounded-xl border border-gray-200 divide-y divide-gray-100">
+            {analytics.recentViews.map((view) => (
+              <div key={view.id} className="px-4 py-3 flex justify-between items-center text-sm">
+                <span className="text-gray-700 capitalize">
+                  {view.viewerRole === 'employer' ? 'An employer' : 'A ' + view.viewerRole} viewed your profile
+                </span>
+                <span className="text-gray-400 text-xs">
+                  {view.createdAt ? new Date(view.createdAt).toLocaleDateString() : ''}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       <h2 className="text-xl font-semibold text-gray-900 mb-4">Saved Jobs</h2>
       {savedLoading ? (

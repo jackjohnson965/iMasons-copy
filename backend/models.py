@@ -5,6 +5,30 @@ from database import Base
 NOW = text("(datetime('now'))")
 
 
+class User(Base):
+    """
+    Authentication user account.
+    Linked to either a Student or Employer profile via linkedProfileId.
+    Admin users have no linked profile (linkedProfileId is None).
+    """
+    __tablename__ = "users"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    email = Column(Text, nullable=False, unique=True)
+    hashedPassword = Column(Text, nullable=False)
+    # role is one of: student, employer, admin
+    role = Column(Text, nullable=False)
+    # iMasons-issued identifier: STU-XXXX, EMP-XXXX, or ADM-XXXX
+    imasonsIdentifier = Column(Text, nullable=False, unique=True)
+    # References the Student.id or Employer.id; NULL for admin users
+    linkedProfileId = Column(Integer, nullable=True)
+    createdAt = Column(Text, server_default=NOW)
+
+    __table_args__ = (
+        CheckConstraint("role IN ('student', 'employer', 'admin')"),
+    )
+
+
 class Student(Base):
     __tablename__ = "students"
 
@@ -52,12 +76,16 @@ class JobPosting(Base):
     location = Column(Text, default="")
     jobType = Column(Text, nullable=False)
     industry = Column(Text, default="")
+    # Legacy field kept for backward compatibility; use `status` for business logic
     isActive = Column(Integer, default=1)
+    # Canonical status: active | closed | archived
+    status = Column(Text, default="active")
     createdAt = Column(Text, server_default=NOW)
     updatedAt = Column(Text, server_default=NOW)
 
     __table_args__ = (
         CheckConstraint("jobType IN ('internship', 'full-time', 'part-time', 'mentorship')"),
+        CheckConstraint("status IN ('active', 'closed', 'archived')"),
     )
 
     employer = relationship("Employer", back_populates="jobPostings")
@@ -102,5 +130,5 @@ class AnalyticsEvent(Base):
     createdAt = Column(Text, server_default=NOW)
 
     __table_args__ = (
-        CheckConstraint("eventType IN ('profile_view', 'posting_view')"),
+        CheckConstraint("eventType IN ('profile_view', 'posting_view', 'email_click')"),
     )

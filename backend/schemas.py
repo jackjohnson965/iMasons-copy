@@ -2,6 +2,54 @@ from pydantic import BaseModel, ConfigDict
 from typing import Optional
 
 
+# --- Auth Schemas ---
+
+class UserRegister(BaseModel):
+    email: str
+    password: str
+    role: str                   # 'student' | 'employer' | 'admin'
+    imasonsIdentifier: str      # e.g., STU-1234
+
+
+class UserLogin(BaseModel):
+    email: str
+    password: str
+
+
+class TokenResponse(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
+    role: str
+    userId: int                 # User.id (auth user row)
+    linkedProfileId: Optional[int] = None  # Student or Employer profile id
+
+
+class UserResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    email: str
+    role: str
+    imasonsIdentifier: str
+    linkedProfileId: Optional[int] = None
+    createdAt: Optional[str] = None
+
+
+# --- Admin Schemas ---
+
+class StudentStatusUpdate(BaseModel):
+    status: str   # 'active' | 'hidden'
+
+
+class JobPostingStatusUpdate(BaseModel):
+    status: str   # 'active' | 'closed' | 'archived'
+
+
+class PasswordResetResponse(BaseModel):
+    tempPassword: str
+    message: str
+
+
 # --- Student Schemas ---
 
 class StudentCreate(BaseModel):
@@ -110,6 +158,7 @@ class JobPostingCreate(BaseModel):
     location: str = ""
     jobType: str
     industry: str = ""
+    status: str = "active"      # replaces isActive; values: active | closed | archived
     customQuestions: list[CustomQuestionCreate] = []
 
 
@@ -119,7 +168,8 @@ class JobPostingUpdate(BaseModel):
     location: Optional[str] = None
     jobType: Optional[str] = None
     industry: Optional[str] = None
-    isActive: Optional[int] = None
+    status: Optional[str] = None   # values: active | closed | archived
+    isActive: Optional[int] = None  # kept for legacy compatibility
 
 
 class JobPostingResponse(BaseModel):
@@ -133,6 +183,7 @@ class JobPostingResponse(BaseModel):
     jobType: str
     industry: str
     isActive: int
+    status: str
     createdAt: Optional[str] = None
     updatedAt: Optional[str] = None
     customQuestions: list[CustomQuestionResponse] = []
@@ -149,6 +200,7 @@ class JobPostingListResponse(BaseModel):
     jobType: str
     industry: str
     isActive: int
+    status: str
     createdAt: Optional[str] = None
     updatedAt: Optional[str] = None
 
@@ -204,4 +256,5 @@ class AnalyticsSummary(BaseModel):
 
 class EmployerAnalyticsSummary(BaseModel):
     totalViews: int
+    totalEmailClicks: int = 0
     postingBreakdown: list[dict] = []

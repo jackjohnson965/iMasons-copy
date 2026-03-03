@@ -1,7 +1,10 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { RoleProvider } from './context/RoleContext';
 import Navbar from './components/Navbar';
+import ProtectedRoute from './components/ProtectedRoute';
 import HomePage from './pages/HomePage';
+import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
 import StudentProfilePage from './pages/StudentProfilePage';
 import StudentProfileViewPage from './pages/StudentProfileViewPage';
 import StudentDashboardPage from './pages/StudentDashboardPage';
@@ -10,6 +13,7 @@ import JobListPage from './pages/JobListPage';
 import JobDetailPage from './pages/JobDetailPage';
 import JobCreatePage from './pages/JobCreatePage';
 import EmployerDashboardPage from './pages/EmployerDashboardPage';
+import AdminDashboardPage from './pages/AdminDashboardPage';
 
 function App() {
   return (
@@ -19,19 +23,27 @@ function App() {
           <Navbar />
           <main className="max-w-7xl mx-auto px-4 py-8">
             <Routes>
+              {/* Public routes */}
               <Route path="/" element={<HomePage />} />
-              <Route path="/student/profile/new" element={<StudentProfilePage />} />
-              <Route path="/student/profile/:id" element={<StudentProfilePage />} />
-              <Route path="/student/profile/:id/view" element={<StudentProfileViewPage />} />
-              <Route path="/student/dashboard" element={<StudentDashboardPage />} />
-              <Route path="/student/dashboard/:id" element={<StudentDashboardPage />} />
-              <Route path="/students" element={<StudentListPage />} />
-              <Route path="/jobs" element={<JobListPage />} />
-              <Route path="/jobs/new" element={<JobCreatePage />} />
-              <Route path="/jobs/:id" element={<JobDetailPage />} />
-              <Route path="/jobs/:id/edit" element={<JobCreatePage />} />
-              <Route path="/employer/dashboard" element={<EmployerDashboardPage />} />
-              <Route path="/employer/dashboard/:id" element={<EmployerDashboardPage />} />
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/register" element={<RegisterPage />} />
+
+              {/* Protected routes — require authentication */}
+              <Route path="/student/profile/new" element={<ProtectedRoute><StudentProfilePage /></ProtectedRoute>} />
+              <Route path="/student/profile/:id" element={<ProtectedRoute><StudentProfilePage /></ProtectedRoute>} />
+              <Route path="/student/profile/:id/view" element={<ProtectedRoute><StudentProfileViewPage /></ProtectedRoute>} />
+              <Route path="/student/dashboard" element={<ProtectedRoute><StudentDashboardPage /></ProtectedRoute>} />
+              <Route path="/student/dashboard/:id" element={<ProtectedRoute><StudentDashboardPage /></ProtectedRoute>} />
+              <Route path="/students" element={<ProtectedRoute><StudentListPage /></ProtectedRoute>} />
+              <Route path="/jobs" element={<ProtectedRoute><JobListPage /></ProtectedRoute>} />
+              <Route path="/jobs/new" element={<ProtectedRoute><JobCreatePage /></ProtectedRoute>} />
+              <Route path="/jobs/:id" element={<ProtectedRoute><JobDetailPage /></ProtectedRoute>} />
+              <Route path="/jobs/:id/edit" element={<ProtectedRoute><JobCreatePage /></ProtectedRoute>} />
+              <Route path="/employer/dashboard" element={<ProtectedRoute><EmployerDashboardPage /></ProtectedRoute>} />
+              <Route path="/employer/dashboard/:id" element={<ProtectedRoute><EmployerDashboardPage /></ProtectedRoute>} />
+
+              {/* Admin-only route */}
+              <Route path="/admin/dashboard" element={<ProtectedRoute role="admin"><AdminDashboardPage /></ProtectedRoute>} />
             </Routes>
           </main>
         </div>

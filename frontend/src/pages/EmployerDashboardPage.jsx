@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useFetch } from '../hooks/useFetch';
 import { useRole } from '../context/RoleContext';
@@ -8,10 +8,10 @@ import StatCard from '../components/StatCard';
 export default function EmployerDashboardPage() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { userId, setUserId } = useRole();
-  const [showSetup, setShowSetup] = useState(!id && !userId);
+  const { linkedProfileId, setAuth } = useRole();
+  const [showSetup, setShowSetup] = useState(!id && !linkedProfileId);
 
-  const employerId = id || userId;
+  const employerId = id || linkedProfileId;
   const { data: employer, loading: employerLoading } = useFetch(employerId ? `/employers/${employerId}` : null);
   const { data: postings, loading: postingsLoading, refetch: refetchPostings } = useFetch(employerId ? `/job-postings?employerId=${employerId}` : null);
   const { data: analytics } = useFetch(employerId ? `/analytics/employer/${employerId}` : null);
@@ -31,7 +31,9 @@ export default function EmployerDashboardPage() {
     setSetupError(null);
     try {
       const emp = await api.post('/employers', setupForm);
-      setUserId(emp.id);
+      // Link the newly created employer profile to the authenticated user
+      const linkRes = await api.post(`/auth/link-profile/${emp.id}`, {});
+      setAuth(linkRes);
       setShowSetup(false);
       navigate(`/employer/dashboard/${emp.id}`);
     } catch (err) {
@@ -135,24 +137,39 @@ export default function EmployerDashboardPage() {
         </Link>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
         <StatCard label="Total Posting Views" value={analytics?.totalViews ?? 0} />
-        <StatCard label="Active Postings" value={postings?.filter((p) => p.isActive).length ?? 0} />
+        <StatCard label="Email Clicks" value={analytics?.totalEmailClicks ?? 0} />
+        <StatCard label="Active Postings" value={postings?.filter((p) => p.status === 'active').length ?? 0} />
         <StatCard label="Total Postings" value={postings?.length ?? 0} />
       </div>
 
       {analytics?.postingBreakdown?.length > 0 && (
         <div className="mb-8">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">Views by Posting</h2>
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 divide-y">
-            {analytics.postingBreakdown.map((item) => (
-              <div key={item.postingId} className="flex items-center justify-between px-4 py-3">
-                <Link to={`/jobs/${item.postingId}`} className="text-blue-600 hover:text-blue-800">
-                  {item.title}
-                </Link>
-                <span className="text-gray-500">{item.views} views</span>
-              </div>
-            ))}
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">Analytics by Posting</h2>
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+            <table className="w-full text-sm">
+              <thead className="bg-gray-50 text-gray-600 text-left">
+                <tr>
+                  <th className="px-4 py-3 font-medium">Posting</th>
+                  <th className="px-4 py-3 font-medium text-right">Views</th>
+                  <th className="px-4 py-3 font-medium text-right">Email Clicks</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {analytics.postingBreakdown.map((item) => (
+                  <tr key={item.postingId}>
+                    <td className="px-4 py-3">
+                      <Link to={`/jobs/${item.postingId}`} className="text-blue-600 hover:text-blue-800">
+                        {item.title}
+                      </Link>
+                    </td>
+                    <td className="px-4 py-3 text-right text-gray-600">{item.views}</td>
+                    <td className="px-4 py-3 text-right text-gray-600">{item.emailClicks ?? 0}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
       )}
@@ -162,38 +179,47 @@ export default function EmployerDashboardPage() {
         <p className="text-gray-500">Loading postings...</p>
       ) : postings?.length > 0 ? (
         <div className="space-y-3">
-          {postings.map((p) => (
-            <div
-              key={p.id}
-              className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 flex items-center justify-between"
-            >
-              <div>
-                <Link to={`/jobs/${p.id}`} className="font-medium text-gray-900 hover:text-blue-600">
-                  {p.title}
-                </Link>
-                <div className="text-sm text-gray-500 mt-1">
-                  {p.jobType} {p.location && `- ${p.location}`}
-                  {!p.isActive && <span className="text-red-500 ml-2">(Inactive)</span>}
+          {postings.map((p) => {
+            const statusColors = {
+              active: 'text-green-600',
+              closed: 'text-red-500',
+              archived: 'text-gray-500',
+            };
+            return (
+              <div
+                key={p.id}
+                className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 flex items-center justify-between"
+              >
+                <div>
+                  <Link to={`/jobs/${p.id}`} className="font-medium text-gray-900 hover:text-blue-600">
+                    {p.title}
+                  </Link>
+                  <div className="text-sm text-gray-500 mt-1">
+                    {p.jobType} {p.location && `- ${p.location}`}
+                    <span className={`ml-2 capitalize ${statusColors[p.status] || ''}`}>
+                      ({p.status})
+                    </span>
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <Link
+                    to={`/jobs/${p.id}/edit`}
+                    className="text-sm text-blue-600 hover:text-blue-800"
+                  >
+                    Edit
+                  </Link>
+                  {p.status === 'active' && (
+                    <button
+                      onClick={() => handleDeactivate(p.id)}
+                      className="text-sm text-red-500 hover:text-red-700"
+                    >
+                      Close
+                    </button>
+                  )}
                 </div>
               </div>
-              <div className="flex gap-2">
-                <Link
-                  to={`/jobs/${p.id}/edit`}
-                  className="text-sm text-blue-600 hover:text-blue-800"
-                >
-                  Edit
-                </Link>
-                {p.isActive === 1 && (
-                  <button
-                    onClick={() => handleDeactivate(p.id)}
-                    className="text-sm text-red-500 hover:text-red-700"
-                  >
-                    Deactivate
-                  </button>
-                )}
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       ) : (
         <p className="text-gray-400 py-8 text-center">No postings yet. Create your first job posting!</p>

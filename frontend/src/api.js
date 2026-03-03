@@ -2,9 +2,13 @@ const BASE_URL = '/api';
 
 export async function apiFetch(path, options = {}) {
   const url = `${BASE_URL}${path}`;
+
+  // Automatically attach JWT token from localStorage if present
+  const token = localStorage.getItem('token');
   const config = {
     headers: {
       'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...options.headers,
     },
     ...options,
