@@ -21,9 +21,9 @@ function App() {
   return (
     <RoleProvider>
       <BrowserRouter>
-        <div className="min-h-screen bg-brand-bg">
+        <div className="min-h-screen bg-brand-dark text-white">
           <Navbar />
-          <main className="max-w-7xl mx-auto px-4 py-8">
+          <main className="w-full pt-16">
             <Routes>
               {/* Public routes */}
               <Route path="/" element={<HomePage />} />

@@ -3,6 +3,9 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { api } from '../api';
 import { useRole } from '../context/RoleContext';
 
+const inputCls = 'w-full bg-brand-dark-elevated border border-white/10 text-white placeholder:text-white/30 rounded-lg px-3 py-2 focus:ring-2 focus:ring-brand-cyan focus:border-brand-cyan outline-none transition-colors';
+const labelCls = 'block text-sm font-medium text-white/60 mb-1';
+
 export default function StudentProfilePage() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -55,121 +58,69 @@ export default function StudentProfilePage() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto">
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">
+    <div className="max-w-2xl mx-auto px-6 py-10">
+      <h1 className="text-2xl font-bold text-white mb-6">
         {isEdit ? 'Edit Profile' : 'Create Student Profile'}
       </h1>
       {error && (
-        <div className="bg-red-50 text-red-700 p-3 rounded-lg mb-4">{error}</div>
+        <div className="bg-red-500/10 border border-red-500/30 text-red-400 p-3 rounded-lg mb-4 text-sm">{error}</div>
       )}
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">First Name *</label>
-            <input
-              name="firstName"
-              value={form.firstName}
-              onChange={handleChange}
-              required
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            />
+            <label className={labelCls}>First Name *</label>
+            <input name="firstName" value={form.firstName} onChange={handleChange} required className={inputCls} />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Last Name *</label>
-            <input
-              name="lastName"
-              value={form.lastName}
-              onChange={handleChange}
-              required
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            />
+            <label className={labelCls}>Last Name *</label>
+            <input name="lastName" value={form.lastName} onChange={handleChange} required className={inputCls} />
           </div>
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Email *</label>
-          <input
-            name="email"
-            type="email"
-            value={form.email}
-            onChange={handleChange}
-            required
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-          />
+          <label className={labelCls}>Email *</label>
+          <input name="email" type="email" value={form.email} onChange={handleChange} required className={inputCls} />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Bio</label>
+          <label className={labelCls}>Bio</label>
           <textarea
             name="bio"
             value={form.bio}
             onChange={handleChange}
             rows={4}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className={inputCls}
             placeholder="Tell employers about yourself..."
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
-          <input
-            name="location"
-            value={form.location}
-            onChange={handleChange}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            placeholder="e.g., Dallas, TX"
-          />
+          <label className={labelCls}>Location</label>
+          <input name="location" value={form.location} onChange={handleChange} className={inputCls} placeholder="e.g., Dallas, TX" />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Skills</label>
-          <input
-            name="skills"
-            value={form.skills}
-            onChange={handleChange}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            placeholder="e.g., Python, React, SQL (comma-separated)"
-          />
+          <label className={labelCls}>Skills</label>
+          <input name="skills" value={form.skills} onChange={handleChange} className={inputCls} placeholder="e.g., Python, React, SQL (comma-separated)" />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Resume Link</label>
-          <input
-            name="resumeLink"
-            value={form.resumeLink}
-            onChange={handleChange}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            placeholder="Link to your resume (Google Drive, etc.)"
-          />
+          <label className={labelCls}>Resume Link</label>
+          <input name="resumeLink" value={form.resumeLink} onChange={handleChange} className={inputCls} placeholder="Link to your resume (Google Drive, etc.)" />
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">LinkedIn</label>
-            <input
-              name="linkedinUrl"
-              value={form.linkedinUrl}
-              onChange={handleChange}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            />
+            <label className={labelCls}>LinkedIn</label>
+            <input name="linkedinUrl" value={form.linkedinUrl} onChange={handleChange} className={inputCls} />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">GitHub</label>
-            <input
-              name="githubUrl"
-              value={form.githubUrl}
-              onChange={handleChange}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            />
+            <label className={labelCls}>GitHub</label>
+            <input name="githubUrl" value={form.githubUrl} onChange={handleChange} className={inputCls} />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Portfolio</label>
-            <input
-              name="portfolioUrl"
-              value={form.portfolioUrl}
-              onChange={handleChange}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            />
+            <label className={labelCls}>Portfolio</label>
+            <input name="portfolioUrl" value={form.portfolioUrl} onChange={handleChange} className={inputCls} />
           </div>
         </div>
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 disabled:opacity-50 font-medium"
+          className="w-full bg-brand-purple hover:bg-brand-purple-dark text-white py-2.5 px-4 rounded-lg disabled:opacity-50 font-semibold transition-colors"
         >
           {loading ? 'Saving...' : isEdit ? 'Update Profile' : 'Create Profile'}
         </button>

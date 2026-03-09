@@ -39,18 +39,15 @@ export default function StudentListPage() {
   ];
 
   return (
-    <div>
-      <h1 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-        <img src="/images/group-icon.png" alt="Student directory" className="h-7 w-7 object-contain" />
-        Browse Students
-      </h1>
+    <div className="max-w-7xl mx-auto px-6 py-10">
+      <h1 className="text-3xl font-bold text-white mb-8 border-l-4 border-brand-cyan pl-4">Browse Students</h1>
       <div className="flex flex-col md:flex-row gap-6">
         <div className="w-full md:w-64 shrink-0">
           <FilterSidebar filters={filters} onChange={setFilters} config={filterConfig} />
         </div>
         <div className="flex-1">
           {loading ? (
-            <p className="text-gray-500 text-center py-12">Loading students...</p>
+            <p className="text-white/50 text-center py-12">Loading students...</p>
           ) : students.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {students.map((student) => (
@@ -58,7 +55,7 @@ export default function StudentListPage() {
               ))}
             </div>
           ) : (
-            <p className="text-gray-400 text-center py-12">No students found matching your filters.</p>
+            <p className="text-white/30 text-center py-12">No students found matching your filters.</p>
           )}
         </div>
       </div>

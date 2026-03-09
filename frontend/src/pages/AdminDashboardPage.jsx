@@ -36,18 +36,21 @@ export default function AdminDashboardPage() {
     { id: 'users', label: 'Users' },
   ];
 
+  const thCls = 'px-4 py-3 font-medium text-left';
+  const tdCls = 'px-4 py-3';
+
   return (
-    <div>
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">Admin Dashboard</h1>
+    <div className="max-w-7xl mx-auto px-6 py-10">
+      <h1 className="text-3xl font-bold text-white mb-6">Admin Dashboard</h1>
 
       {/* Tab navigation */}
-      <div className="flex gap-1 bg-gray-100 rounded-lg p-1 mb-6 w-fit">
+      <div className="flex gap-1 bg-brand-dark-elevated rounded-lg p-1 mb-6 w-fit">
         {tabs.map((t) => (
           <button
             key={t.id}
             onClick={() => { setTab(t.id); setResetResult(null); }}
             className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-              tab === t.id ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'
+              tab === t.id ? 'bg-brand-purple text-white shadow-sm' : 'text-white/50 hover:text-white'
             }`}
           >
             {t.label}
@@ -57,44 +60,46 @@ export default function AdminDashboardPage() {
 
       {/* Students tab */}
       {tab === 'students' && (
-        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+        <div className="bg-brand-dark-card border border-white/10 rounded-xl overflow-hidden">
           {studentsLoading ? (
-            <p className="p-6 text-gray-500">Loading students...</p>
+            <p className="p-6 text-white/50">Loading students...</p>
           ) : !students?.length ? (
-            <p className="p-6 text-gray-400">No students found.</p>
+            <p className="p-6 text-white/30">No students found.</p>
           ) : (
             <table className="w-full text-sm">
-              <thead className="bg-gray-50 text-gray-600 text-left">
+              <thead className="bg-white/5 text-white/40 text-left uppercase text-xs tracking-wider">
                 <tr>
-                  <th className="px-4 py-3 font-medium">ID</th>
-                  <th className="px-4 py-3 font-medium">Name</th>
-                  <th className="px-4 py-3 font-medium">Email</th>
-                  <th className="px-4 py-3 font-medium">Location</th>
-                  <th className="px-4 py-3 font-medium">Status</th>
-                  <th className="px-4 py-3 font-medium">Actions</th>
+                  <th className={thCls}>ID</th>
+                  <th className={thCls}>Name</th>
+                  <th className={thCls}>Email</th>
+                  <th className={thCls}>Location</th>
+                  <th className={thCls}>Status</th>
+                  <th className={thCls}>Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody className="divide-y divide-white/5">
                 {students.map((s) => (
-                  <tr key={s.id}>
-                    <td className="px-4 py-3 text-gray-500">{s.id}</td>
-                    <td className="px-4 py-3 font-medium text-gray-900">{s.firstName} {s.lastName}</td>
-                    <td className="px-4 py-3 text-gray-600">{s.email}</td>
-                    <td className="px-4 py-3 text-gray-600">{s.location || '—'}</td>
-                    <td className="px-4 py-3">
+                  <tr key={s.id} className="hover:bg-white/2">
+                    <td className={`${tdCls} text-white/30`}>{s.id}</td>
+                    <td className={`${tdCls} font-medium text-white`}>{s.firstName} {s.lastName}</td>
+                    <td className={`${tdCls} text-white/60`}>{s.email}</td>
+                    <td className={`${tdCls} text-white/60`}>{s.location || '—'}</td>
+                    <td className={tdCls}>
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        s.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'
+                        s.isActive
+                          ? 'bg-brand-cyan/20 text-brand-cyan border border-brand-cyan/30'
+                          : 'bg-white/10 text-white/40 border border-white/10'
                       }`}>
                         {s.isActive ? 'Active' : 'Hidden'}
                       </span>
                     </td>
-                    <td className="px-4 py-3">
+                    <td className={tdCls}>
                       <button
                         onClick={() => toggleStudentStatus(s)}
-                        className={`text-xs font-medium px-3 py-1 rounded-lg ${
+                        className={`text-xs font-medium px-3 py-1 rounded-lg border transition-colors ${
                           s.isActive
-                            ? 'bg-yellow-50 text-yellow-700 hover:bg-yellow-100'
-                            : 'bg-green-50 text-green-700 hover:bg-green-100'
+                            ? 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20 hover:bg-yellow-500/20'
+                            : 'bg-brand-cyan/10 text-brand-cyan border-brand-cyan/20 hover:bg-brand-cyan/20'
                         }`}
                       >
                         {s.isActive ? 'Hide' : 'Activate'}
@@ -110,52 +115,52 @@ export default function AdminDashboardPage() {
 
       {/* Job Postings tab */}
       {tab === 'postings' && (
-        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+        <div className="bg-brand-dark-card border border-white/10 rounded-xl overflow-hidden">
           {postingsLoading ? (
-            <p className="p-6 text-gray-500">Loading postings...</p>
+            <p className="p-6 text-white/50">Loading postings...</p>
           ) : !postings?.length ? (
-            <p className="p-6 text-gray-400">No job postings found.</p>
+            <p className="p-6 text-white/30">No job postings found.</p>
           ) : (
             <table className="w-full text-sm">
-              <thead className="bg-gray-50 text-gray-600 text-left">
+              <thead className="bg-white/5 text-white/40 text-left uppercase text-xs tracking-wider">
                 <tr>
-                  <th className="px-4 py-3 font-medium">ID</th>
-                  <th className="px-4 py-3 font-medium">Title</th>
-                  <th className="px-4 py-3 font-medium">Type</th>
-                  <th className="px-4 py-3 font-medium">Status</th>
-                  <th className="px-4 py-3 font-medium">Actions</th>
+                  <th className={thCls}>ID</th>
+                  <th className={thCls}>Title</th>
+                  <th className={thCls}>Type</th>
+                  <th className={thCls}>Status</th>
+                  <th className={thCls}>Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody className="divide-y divide-white/5">
                 {postings.map((p) => {
-                  const statusColors = {
-                    active: 'bg-green-100 text-green-800',
-                    closed: 'bg-red-100 text-red-800',
-                    archived: 'bg-gray-100 text-gray-600',
+                  const statusBadge = {
+                    active: 'bg-brand-cyan/20 text-brand-cyan border border-brand-cyan/30',
+                    closed: 'bg-red-500/20 text-red-400 border border-red-500/30',
+                    archived: 'bg-white/10 text-white/40 border border-white/10',
                   };
                   return (
-                    <tr key={p.id}>
-                      <td className="px-4 py-3 text-gray-500">{p.id}</td>
-                      <td className="px-4 py-3 font-medium text-gray-900">{p.title}</td>
-                      <td className="px-4 py-3 text-gray-600 capitalize">{p.jobType}</td>
-                      <td className="px-4 py-3">
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium capitalize ${statusColors[p.status] || 'bg-gray-100'}`}>
+                    <tr key={p.id} className="hover:bg-white/2">
+                      <td className={`${tdCls} text-white/30`}>{p.id}</td>
+                      <td className={`${tdCls} font-medium text-white`}>{p.title}</td>
+                      <td className={`${tdCls} text-white/60 capitalize`}>{p.jobType}</td>
+                      <td className={tdCls}>
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium capitalize ${statusBadge[p.status] || 'bg-white/10 text-white/40'}`}>
                           {p.status}
                         </span>
                       </td>
-                      <td className="px-4 py-3 flex gap-2">
+                      <td className={`${tdCls} flex gap-2`}>
                         {p.status !== 'active' && (
-                          <button onClick={() => setPostingStatus(p.id, 'active')} className="text-xs font-medium px-3 py-1 rounded-lg bg-green-50 text-green-700 hover:bg-green-100">
+                          <button onClick={() => setPostingStatus(p.id, 'active')} className="text-xs font-medium px-3 py-1 rounded-lg bg-brand-cyan/10 text-brand-cyan border border-brand-cyan/20 hover:bg-brand-cyan/20">
                             Activate
                           </button>
                         )}
                         {p.status !== 'closed' && (
-                          <button onClick={() => setPostingStatus(p.id, 'closed')} className="text-xs font-medium px-3 py-1 rounded-lg bg-red-50 text-red-700 hover:bg-red-100">
+                          <button onClick={() => setPostingStatus(p.id, 'closed')} className="text-xs font-medium px-3 py-1 rounded-lg bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500/20">
                             Close
                           </button>
                         )}
                         {p.status !== 'archived' && (
-                          <button onClick={() => setPostingStatus(p.id, 'archived')} className="text-xs font-medium px-3 py-1 rounded-lg bg-gray-50 text-gray-700 hover:bg-gray-200">
+                          <button onClick={() => setPostingStatus(p.id, 'archived')} className="text-xs font-medium px-3 py-1 rounded-lg bg-white/5 text-white/50 border border-white/10 hover:bg-white/10">
                             Archive
                           </button>
                         )}
@@ -173,45 +178,45 @@ export default function AdminDashboardPage() {
       {tab === 'users' && (
         <div>
           {resetResult && (
-            <div className="bg-blue-50 border border-blue-200 text-blue-800 p-4 rounded-lg mb-4 text-sm">
+            <div className="bg-brand-cyan/10 border border-brand-cyan/20 text-brand-cyan p-4 rounded-lg mb-4 text-sm">
               <p className="font-medium">{resetResult.message}</p>
               {resetResult.tempPassword && (
-                <p className="mt-1">
-                  Temporary password: <code className="bg-blue-100 px-2 py-0.5 rounded font-mono">{resetResult.tempPassword}</code>
+                <p className="mt-1 text-white/70">
+                  Temporary password: <code className="bg-brand-dark-elevated px-2 py-0.5 rounded font-mono text-brand-cyan">{resetResult.tempPassword}</code>
                 </p>
               )}
             </div>
           )}
 
-          <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+          <div className="bg-brand-dark-card border border-white/10 rounded-xl overflow-hidden">
             {usersLoading ? (
-              <p className="p-6 text-gray-500">Loading users...</p>
+              <p className="p-6 text-white/50">Loading users...</p>
             ) : !users?.length ? (
-              <p className="p-6 text-gray-400">No users found.</p>
+              <p className="p-6 text-white/30">No users found.</p>
             ) : (
               <table className="w-full text-sm">
-                <thead className="bg-gray-50 text-gray-600 text-left">
+                <thead className="bg-white/5 text-white/40 text-left uppercase text-xs tracking-wider">
                   <tr>
-                    <th className="px-4 py-3 font-medium">ID</th>
-                    <th className="px-4 py-3 font-medium">Email</th>
-                    <th className="px-4 py-3 font-medium">Role</th>
-                    <th className="px-4 py-3 font-medium">iMasons ID</th>
-                    <th className="px-4 py-3 font-medium">Profile ID</th>
-                    <th className="px-4 py-3 font-medium">Actions</th>
+                    <th className={thCls}>ID</th>
+                    <th className={thCls}>Email</th>
+                    <th className={thCls}>Role</th>
+                    <th className={thCls}>iMasons ID</th>
+                    <th className={thCls}>Profile ID</th>
+                    <th className={thCls}>Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-100">
+                <tbody className="divide-y divide-white/5">
                   {users.map((u) => (
-                    <tr key={u.id}>
-                      <td className="px-4 py-3 text-gray-500">{u.id}</td>
-                      <td className="px-4 py-3 text-gray-900">{u.email}</td>
-                      <td className="px-4 py-3 capitalize text-gray-600">{u.role}</td>
-                      <td className="px-4 py-3 font-mono text-xs text-gray-500">{u.imasonsIdentifier}</td>
-                      <td className="px-4 py-3 text-gray-500">{u.linkedProfileId ?? '—'}</td>
-                      <td className="px-4 py-3">
+                    <tr key={u.id} className="hover:bg-white/2">
+                      <td className={`${tdCls} text-white/30`}>{u.id}</td>
+                      <td className={`${tdCls} text-white`}>{u.email}</td>
+                      <td className={`${tdCls} capitalize text-white/60`}>{u.role}</td>
+                      <td className={`${tdCls} font-mono text-xs text-white/40`}>{u.imasonsIdentifier}</td>
+                      <td className={`${tdCls} text-white/40`}>{u.linkedProfileId ?? '—'}</td>
+                      <td className={tdCls}>
                         <button
                           onClick={() => resetPassword(u.id)}
-                          className="text-xs font-medium px-3 py-1 rounded-lg bg-orange-50 text-orange-700 hover:bg-orange-100"
+                          className="text-xs font-medium px-3 py-1 rounded-lg bg-brand-purple/20 text-brand-cyan border border-brand-purple/30 hover:bg-brand-purple/30"
                         >
                           Reset Password
                         </button>

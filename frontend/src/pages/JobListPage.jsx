@@ -80,18 +80,15 @@ export default function JobListPage() {
   ];
 
   return (
-    <div>
-      <h1 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-        <img src="/images/search-icon.png" alt="Job search" className="h-7 w-7 object-contain" />
-        Browse Jobs
-      </h1>
+    <div className="max-w-7xl mx-auto px-6 py-10">
+      <h1 className="text-3xl font-bold text-white mb-8 border-l-4 border-brand-cyan pl-4">Browse Jobs</h1>
       <div className="flex flex-col md:flex-row gap-6">
         <div className="w-full md:w-64 shrink-0">
           <FilterSidebar filters={filters} onChange={setFilters} config={filterConfig} />
         </div>
         <div className="flex-1">
           {loading ? (
-            <p className="text-gray-500 text-center py-12">Loading jobs...</p>
+            <p className="text-white/50 text-center py-12">Loading jobs...</p>
           ) : jobs.length > 0 ? (
             <div className="space-y-4">
               {jobs.map((job) => (
@@ -105,7 +102,7 @@ export default function JobListPage() {
               ))}
             </div>
           ) : (
-            <p className="text-gray-400 text-center py-12">No jobs found matching your filters.</p>
+            <p className="text-white/30 text-center py-12">No jobs found matching your filters.</p>
           )}
         </div>
       </div>

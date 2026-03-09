@@ -6,6 +6,9 @@ import { api } from '../api';
 import JobCard from '../components/JobCard';
 import StatCard from '../components/StatCard';
 
+const inputCls = 'w-full bg-brand-dark-elevated border border-white/10 text-white placeholder:text-white/30 rounded-lg px-3 py-2 focus:ring-2 focus:ring-brand-cyan focus:border-brand-cyan outline-none transition-colors';
+const labelCls = 'block text-sm font-medium text-white/60 mb-1';
+
 export default function StudentDashboardPage() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -42,7 +45,6 @@ export default function StudentDashboardPage() {
     setSetupLoading(true);
     try {
       const stu = await api.post('/students', setupForm);
-      // Link the newly created student profile to the authenticated user
       const linkRes = await api.post(`/auth/link-profile/${stu.id}`, {});
       setAuth(linkRes);
       setShowSetup(false);
@@ -61,122 +63,70 @@ export default function StudentDashboardPage() {
 
   if (showSetup) {
     return (
-      <div className="max-w-2xl mx-auto">
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">Set Up Student Profile</h1>
-        <p className="text-gray-500 mb-6">Create your profile to start browsing and saving job opportunities.</p>
+      <div className="max-w-2xl mx-auto px-6 py-10">
+        <h1 className="text-2xl font-bold text-white mb-2">Set Up Student Profile</h1>
+        <p className="text-white/50 mb-6">Create your profile to start browsing and saving job opportunities.</p>
         {setupError && (
-          <div className="bg-red-50 text-red-700 p-3 rounded-lg mb-4">{setupError}</div>
+          <div className="bg-red-500/10 border border-red-500/30 text-red-400 p-3 rounded-lg mb-4 text-sm">{setupError}</div>
         )}
         <form onSubmit={handleSetup} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">First Name *</label>
-              <input
-                name="firstName"
-                value={setupForm.firstName}
-                onChange={handleSetupChange}
-                required
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              />
+              <label className={labelCls}>First Name *</label>
+              <input name="firstName" value={setupForm.firstName} onChange={handleSetupChange} required className={inputCls} />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Last Name *</label>
-              <input
-                name="lastName"
-                value={setupForm.lastName}
-                onChange={handleSetupChange}
-                required
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              />
+              <label className={labelCls}>Last Name *</label>
+              <input name="lastName" value={setupForm.lastName} onChange={handleSetupChange} required className={inputCls} />
             </div>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Email *</label>
-            <input
-              name="email"
-              type="email"
-              value={setupForm.email}
-              onChange={handleSetupChange}
-              required
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            />
+            <label className={labelCls}>Email *</label>
+            <input name="email" type="email" value={setupForm.email} onChange={handleSetupChange} required className={inputCls} />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Bio</label>
+            <label className={labelCls}>Bio</label>
             <textarea
               name="bio"
               value={setupForm.bio}
               onChange={handleSetupChange}
               rows={3}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className={inputCls}
               placeholder="Tell employers about yourself..."
             />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
-              <input
-                name="location"
-                value={setupForm.location}
-                onChange={handleSetupChange}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="e.g., Dallas, TX"
-              />
+              <label className={labelCls}>Location</label>
+              <input name="location" value={setupForm.location} onChange={handleSetupChange} className={inputCls} placeholder="e.g., Dallas, TX" />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Skills</label>
-              <input
-                name="skills"
-                value={setupForm.skills}
-                onChange={handleSetupChange}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="e.g., Python, React, SQL"
-              />
+              <label className={labelCls}>Skills</label>
+              <input name="skills" value={setupForm.skills} onChange={handleSetupChange} className={inputCls} placeholder="e.g., Python, React, SQL" />
             </div>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Resume Link</label>
-            <input
-              name="resumeLink"
-              value={setupForm.resumeLink}
-              onChange={handleSetupChange}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="Link to your resume (Google Drive, etc.)"
-            />
+            <label className={labelCls}>Resume Link</label>
+            <input name="resumeLink" value={setupForm.resumeLink} onChange={handleSetupChange} className={inputCls} placeholder="Link to your resume (Google Drive, etc.)" />
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">LinkedIn</label>
-              <input
-                name="linkedinUrl"
-                value={setupForm.linkedinUrl}
-                onChange={handleSetupChange}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              />
+              <label className={labelCls}>LinkedIn</label>
+              <input name="linkedinUrl" value={setupForm.linkedinUrl} onChange={handleSetupChange} className={inputCls} />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">GitHub</label>
-              <input
-                name="githubUrl"
-                value={setupForm.githubUrl}
-                onChange={handleSetupChange}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              />
+              <label className={labelCls}>GitHub</label>
+              <input name="githubUrl" value={setupForm.githubUrl} onChange={handleSetupChange} className={inputCls} />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Portfolio</label>
-              <input
-                name="portfolioUrl"
-                value={setupForm.portfolioUrl}
-                onChange={handleSetupChange}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              />
+              <label className={labelCls}>Portfolio</label>
+              <input name="portfolioUrl" value={setupForm.portfolioUrl} onChange={handleSetupChange} className={inputCls} />
             </div>
           </div>
           <button
             type="submit"
             disabled={setupLoading}
-            className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 disabled:opacity-50 font-medium"
+            className="w-full bg-brand-purple hover:bg-brand-purple-dark text-white py-2.5 px-4 rounded-lg disabled:opacity-50 font-semibold transition-colors"
           >
             {setupLoading ? 'Creating...' : 'Create Student Profile'}
           </button>
@@ -185,44 +135,43 @@ export default function StudentDashboardPage() {
     );
   }
 
-  if (studentLoading) return <div className="text-center py-12 text-gray-500">Loading...</div>;
-  if (!student) return <div className="text-center py-12 text-gray-500">Student not found</div>;
+  if (studentLoading) return <div className="text-center py-12 text-white/50">Loading...</div>;
+  if (!student) return <div className="text-center py-12 text-white/50">Student not found</div>;
 
   return (
-    <div>
+    <div className="max-w-7xl mx-auto px-6 py-10">
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">
+          <h1 className="text-3xl font-bold text-white">
             Welcome, {student.firstName}!
           </h1>
-          <p className="text-gray-500">{student.email}</p>
+          <p className="text-white/50 mt-1">{student.email}</p>
         </div>
         <Link
           to={`/student/profile/${studentId}`}
-          className="flex items-center gap-2 bg-brand-purple text-white px-4 py-2 rounded-lg hover:bg-brand-purple-dark transition-colors"
+          className="flex items-center gap-2 border border-white/20 text-white hover:border-brand-cyan hover:text-brand-cyan px-4 py-2 rounded-lg transition-colors text-sm font-medium"
         >
           <img src="/images/graduation-cap-icon.png" alt="" className="h-5 w-5 object-contain" aria-hidden="true" />
           Edit Profile
         </Link>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
         <StatCard label="Profile Views" value={analytics?.totalViews ?? 0} />
         <StatCard label="Saved Jobs" value={saved?.length ?? 0} />
         <StatCard label="Status" value={student.isActive ? 'Active' : 'Inactive'} />
       </div>
 
-      {/* Who Viewed My Profile — surfaces profile_view analytics */}
       {analytics?.recentViews?.length > 0 && (
-        <div className="mb-8">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">Recent Profile Views</h2>
-          <div className="bg-white rounded-xl border border-gray-200 divide-y divide-gray-100">
+        <div className="mb-10">
+          <h2 className="text-xl font-semibold text-white mb-4">Recent Profile Views</h2>
+          <div className="bg-brand-dark-card border border-white/10 rounded-xl divide-y divide-white/5">
             {analytics.recentViews.map((view) => (
               <div key={view.id} className="px-4 py-3 flex justify-between items-center text-sm">
-                <span className="text-gray-700 capitalize">
+                <span className="text-white/70 capitalize">
                   {view.viewerRole === 'employer' ? 'An employer' : 'A ' + view.viewerRole} viewed your profile
                 </span>
-                <span className="text-gray-400 text-xs">
+                <span className="text-white/30 text-xs">
                   {view.createdAt ? new Date(view.createdAt).toLocaleDateString() : ''}
                 </span>
               </div>
@@ -231,12 +180,12 @@ export default function StudentDashboardPage() {
         </div>
       )}
 
-      <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center gap-2">
+      <h2 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
         <img src="/images/saved-icon.png" alt="Saved jobs" className="h-6 w-6 object-contain" />
         Saved Jobs
       </h2>
       {savedLoading ? (
-        <p className="text-gray-500">Loading saved jobs...</p>
+        <p className="text-white/50">Loading saved jobs...</p>
       ) : saved?.length > 0 ? (
         <div className="space-y-4">
           {saved.map((s) => (
@@ -246,7 +195,7 @@ export default function StudentDashboardPage() {
               </div>
               <button
                 onClick={() => handleUnsave(s.id)}
-                className="text-red-500 hover:text-red-700 text-sm whitespace-nowrap"
+                className="text-red-400/70 hover:text-red-400 text-sm whitespace-nowrap transition-colors"
               >
                 Unsave
               </button>
@@ -254,7 +203,7 @@ export default function StudentDashboardPage() {
           ))}
         </div>
       ) : (
-        <p className="text-gray-400 py-8 text-center">No saved jobs yet. Browse jobs to save some!</p>
+        <p className="text-white/30 py-8 text-center">No saved jobs yet. Browse jobs to save some!</p>
       )}
     </div>
   );

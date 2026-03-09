@@ -29,51 +29,48 @@ export default function JobDetailPage() {
     }
   };
 
-  /** Log an email_click event and open the employer's email */
   const handleApplyEmail = () => {
-    // Log the click as an analytics event
     api.post('/analytics/events', {
       eventType: 'email_click',
       targetId: Number(id),
       viewerRole: role,
     }).catch(() => {});
 
-    // Open the user's email client
     const subject = encodeURIComponent(`Application Inquiry: ${job.title}`);
     window.location.href = `mailto:${employer.contactEmail}?subject=${subject}`;
   };
 
-  if (loading) return <div className="text-center py-12 text-gray-500">Loading...</div>;
-  if (!job) return <div className="text-center py-12 text-gray-500">Job not found</div>;
+  if (loading) return <div className="text-center py-12 text-white/50">Loading...</div>;
+  if (!job) return <div className="text-center py-12 text-white/50">Job not found</div>;
 
   const typeColors = {
-    internship: 'bg-blue-100 text-blue-800',
-    'full-time': 'bg-green-100 text-green-800',
-    'part-time': 'bg-yellow-100 text-yellow-800',
-    mentorship: 'bg-purple-100 text-purple-800',
+    internship: 'bg-brand-purple/30 text-brand-cyan border border-brand-purple/40',
+    'full-time': 'bg-brand-teal/30 text-brand-cyan border border-brand-teal/40',
+    'part-time': 'bg-brand-purple/20 text-white/70 border border-white/10',
+    mentorship: 'bg-brand-cyan/20 text-brand-cyan border border-brand-cyan/30',
   };
 
   const statusColors = {
-    active: 'bg-green-100 text-green-800',
-    closed: 'bg-red-100 text-red-800',
-    archived: 'bg-gray-100 text-gray-600',
+    active: 'bg-brand-cyan/20 text-brand-cyan border border-brand-cyan/30',
+    closed: 'bg-red-500/20 text-red-400 border border-red-500/30',
+    archived: 'bg-white/10 text-white/40 border border-white/10',
   };
 
   return (
-    <div className="max-w-3xl mx-auto">
-      <Link to="/jobs" className="text-blue-600 hover:text-blue-800 text-sm mb-4 inline-block">
-        &larr; Back to Jobs
+    <div className="max-w-3xl mx-auto px-6 py-10">
+      <Link to="/jobs" className="text-brand-cyan hover:text-white text-sm mb-6 inline-flex items-center gap-1 transition-colors">
+        ← Back to Jobs
       </Link>
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+      <div className="bg-brand-dark-card border border-white/10 rounded-xl p-6">
         <div className="flex items-start justify-between mb-4">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">{job.title}</h1>
+            <h1 className="text-2xl font-bold text-white">{job.title}</h1>
             {employer && (
-              <p className="text-gray-600 mt-1">{employer.companyName}</p>
+              <p className="text-white/50 mt-1">{employer.companyName}</p>
             )}
           </div>
           <div className="flex gap-2">
-            <span className={`px-3 py-1 rounded-full text-sm font-medium ${typeColors[job.jobType] || 'bg-gray-100 text-gray-800'}`}>
+            <span className={`px-3 py-1 rounded-full text-sm font-medium ${typeColors[job.jobType] || 'bg-white/10 text-white/60'}`}>
               {job.jobType}
             </span>
             {job.status && job.status !== 'active' && (
@@ -84,7 +81,7 @@ export default function JobDetailPage() {
           </div>
         </div>
 
-        <div className="flex flex-wrap gap-4 text-sm text-gray-500 mb-6">
+        <div className="flex flex-wrap gap-4 text-sm text-white/50 mb-6">
           {job.location && <span>📍 {job.location}</span>}
           {job.industry && <span>🏭 {job.industry}</span>}
           {job.createdAt && (
@@ -95,30 +92,30 @@ export default function JobDetailPage() {
           )}
         </div>
 
-        <div className="prose max-w-none mb-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">Description</h3>
-          <p className="text-gray-700 whitespace-pre-wrap">{job.description}</p>
+        <div className="mb-6">
+          <h3 className="text-base font-semibold text-white/60 uppercase tracking-wide text-xs mb-3">Description</h3>
+          <p className="text-white/70 whitespace-pre-wrap leading-relaxed">{job.description}</p>
         </div>
 
         {job.customQuestions?.length > 0 && (
           <div className="mb-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Application Questions</h3>
+            <h3 className="text-base font-semibold text-white/60 uppercase tracking-wide text-xs mb-3">Application Questions</h3>
             <ol className="list-decimal list-inside space-y-2">
               {job.customQuestions.map((q) => (
-                <li key={q.id} className="text-gray-700">{q.questionText}</li>
+                <li key={q.id} className="text-white/70">{q.questionText}</li>
               ))}
             </ol>
           </div>
         )}
 
         {employer && (
-          <div className="border-t border-gray-200 pt-4 mt-4">
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">About the Employer</h3>
-            <p className="font-medium text-gray-800">{employer.companyName}</p>
-            {employer.description && <p className="text-gray-600 text-sm mt-1">{employer.description}</p>}
+          <div className="border-t border-white/10 pt-4 mt-4">
+            <h3 className="text-base font-semibold text-white/60 uppercase tracking-wide text-xs mb-3">About the Employer</h3>
+            <p className="font-medium text-white">{employer.companyName}</p>
+            {employer.description && <p className="text-white/50 text-sm mt-1">{employer.description}</p>}
             {employer.websiteUrl && (
-              <a href={employer.websiteUrl} target="_blank" rel="noreferrer" className="text-blue-600 hover:text-blue-800 text-sm mt-1 inline-block">
-                Visit website
+              <a href={employer.websiteUrl} target="_blank" rel="noreferrer" className="text-brand-cyan hover:text-white text-sm mt-2 inline-block transition-colors">
+                Visit website →
               </a>
             )}
           </div>
@@ -128,7 +125,7 @@ export default function JobDetailPage() {
           <div className="mt-6 flex gap-3">
             <button
               onClick={handleSave}
-              className="flex items-center gap-2 bg-brand-purple text-white px-6 py-2 rounded-lg hover:bg-brand-purple-dark transition-colors font-medium"
+              className="flex items-center gap-2 border border-white/20 text-white hover:border-brand-cyan hover:text-brand-cyan px-6 py-2 rounded-lg font-medium transition-colors text-sm"
             >
               <img src="/images/saved-icon.png" alt="" className="h-5 w-5 object-contain" aria-hidden="true" />
               Save for Later
@@ -136,7 +133,7 @@ export default function JobDetailPage() {
             {employer?.contactEmail && job.status === 'active' && (
               <button
                 onClick={handleApplyEmail}
-                className="flex items-center gap-2 bg-brand-teal text-white px-6 py-2 rounded-lg hover:opacity-90 transition-opacity font-medium"
+                className="flex items-center gap-2 bg-brand-purple hover:bg-brand-purple-dark text-white px-6 py-2 rounded-lg font-medium transition-colors text-sm"
               >
                 <img src="/images/messages-icon.png" alt="" className="h-5 w-5 object-contain" aria-hidden="true" />
                 Apply via Email
