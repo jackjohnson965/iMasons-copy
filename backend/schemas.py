@@ -219,6 +219,31 @@ class JobPostingListResponse(BaseModel):
     updatedAt: Optional[str] = None
 
 
+# --- Resource Schemas ---
+
+class ResourceCreate(BaseModel):
+    title: str
+    description: str
+    url: str
+
+
+class ResourceUpdate(BaseModel):
+    title: Optional[str] = None
+    description: Optional[str] = None
+    url: Optional[str] = None
+
+
+class ResourceResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    title: str
+    description: str
+    url: str
+    createdAt: Optional[str] = None
+    updatedAt: Optional[str] = None
+
+
 # --- Saved Posting Schemas ---
 
 class SavedPostingCreate(BaseModel):

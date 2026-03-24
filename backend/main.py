@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from database import engine, Base
-from routers import students, employers, jobPostings, savedPostings, analytics
+from routers import students, employers, jobPostings, savedPostings, analytics, resources
 from routers import auth as auth_router
 from routers import admin as admin_router
 from routers import mentors  # new mentor/mentorship endpoints
@@ -30,6 +30,7 @@ app.include_router(jobPostings.router)
 app.include_router(mentors.router)  # mentorship-specific endpoints
 app.include_router(savedPostings.router)
 app.include_router(analytics.router)
+app.include_router(resources.router)
 
 # Authentication router
 app.include_router(auth_router.router)

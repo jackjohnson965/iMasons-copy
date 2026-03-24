@@ -32,6 +32,9 @@ export default function Navbar() {
               <Link to="/students" className="text-white/70 hover:text-white transition-colors">
                 Students
               </Link>
+              <Link to="/resources" className="text-white/70 hover:text-white transition-colors">
+                Resources
+              </Link>
               {isStudent && linkedProfileId && (
                 <>
                   <Link

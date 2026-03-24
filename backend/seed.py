@@ -1,6 +1,6 @@
 """Seed the database with sample data for demo purposes."""
 from database import SessionLocal, engine, Base
-from models import Student, Employer, JobPosting, CustomQuestion, AnalyticsEvent, User
+from models import Student, Employer, JobPosting, CustomQuestion, AnalyticsEvent, User, Resource
 from auth import hash_password
 
 Base.metadata.create_all(bind=engine)
@@ -8,7 +8,7 @@ Base.metadata.create_all(bind=engine)
 db = SessionLocal()
 
 # Clear existing data in dependency order
-for model in [AnalyticsEvent, CustomQuestion, JobPosting, User, Student, Employer]:
+for model in [AnalyticsEvent, CustomQuestion, JobPosting, User, Student, Employer, Resource]:
     db.query(model).delete()
 db.commit()
 
@@ -54,6 +54,17 @@ employers = [
              websiteUrl="https://greenenergy.example.com"),
 ]
 db.add_all(employers)
+db.flush()
+
+# Resources
+resources = [
+    Resource(title="iMasons Foundation", description="Learn more about the iMasons Foundation and our mission to shape the digital future.", url="https://imasons.org/"),
+    Resource(title="LinkedIn - Infrastructure Masons", description="Connect with the iMasons community on LinkedIn.", url="https://www.linkedin.com/company/infrastructure-masons/"),
+    Resource(title="Privacy Policy", description="Read our privacy policy to understand how we protect your data.", url="https://imasons.org/privacy-policy/"),
+    Resource(title="GitHub - iMasons", description="Explore open-source projects and code repositories from the iMasons community.", url="https://github.com/imasons"),
+    Resource(title="Career Resources", description="Access guides and resources for building a career in infrastructure and technology.", url="https://imasons.org/careers"),
+]
+db.add_all(resources)
 db.flush()
 
 # Job Postings with Custom Questions

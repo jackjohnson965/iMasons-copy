@@ -16,6 +16,7 @@ import JobCreatePage from './pages/JobCreatePage';
 import MentorCreatePage from './pages/MentorCreatePage';
 import EmployerDashboardPage from './pages/EmployerDashboardPage';
 import AdminDashboardPage from './pages/AdminDashboardPage';
+import ResourcesPage from './pages/ResourcesPage';
 
 function App() {
   return (
@@ -40,6 +41,7 @@ function App() {
               <Route path="/jobs" element={<ProtectedRoute><JobListPage /></ProtectedRoute>} />
               <Route path="/mentors" element={<ProtectedRoute><MentorListPage /></ProtectedRoute>} />
               <Route path="/mentors/new" element={<ProtectedRoute><MentorCreatePage /></ProtectedRoute>} />
+              <Route path="/resources" element={<ProtectedRoute><ResourcesPage /></ProtectedRoute>} />
               <Route path="/jobs/new" element={<ProtectedRoute><JobCreatePage /></ProtectedRoute>} />
               <Route path="/jobs/:id" element={<ProtectedRoute><JobDetailPage /></ProtectedRoute>} />
               <Route path="/jobs/:id/edit" element={<ProtectedRoute><JobCreatePage /></ProtectedRoute>} />

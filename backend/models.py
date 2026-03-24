@@ -132,3 +132,14 @@ class AnalyticsEvent(Base):
     __table_args__ = (
         CheckConstraint("eventType IN ('profile_view', 'posting_view', 'email_click')"),
     )
+
+
+class Resource(Base):
+    __tablename__ = "resources"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    title = Column(Text, nullable=False)
+    description = Column(Text, nullable=False)
+    url = Column(Text, nullable=False)
+    createdAt = Column(Text, server_default=NOW)
+    updatedAt = Column(Text, server_default=NOW)

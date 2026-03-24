@@ -115,6 +115,25 @@ def migrate_analytics_events_constraint(cursor):
     print("  [analytics_events] Table recreated with email_click support.")
 
 
+def migrate_resources_table(cursor):
+    """Create the resources table for managing resource links."""
+    if not table_exists(cursor, "resources"):
+        print("  [resources] Creating resources table...")
+        cursor.execute("""
+            CREATE TABLE resources (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                title TEXT NOT NULL,
+                description TEXT NOT NULL,
+                url TEXT NOT NULL,
+                createdAt TEXT DEFAULT (datetime('now')),
+                updatedAt TEXT DEFAULT (datetime('now'))
+            )
+        """)
+        print("  [resources] Table created.")
+    else:
+        print("  [resources] Table already exists, skipping.")
+
+
 def run_migration():
     if not os.path.exists(DB_PATH):
         print(f"Database not found at {DB_PATH}.")
@@ -135,6 +154,9 @@ def run_migration():
 
         # analytics_events recreation uses its own transaction via executescript
         migrate_analytics_events_constraint(cursor)
+
+        migrate_resources_table(cursor)
+        conn.commit()
 
         print("\nMigration complete. All steps succeeded.")
     except Exception as e:
