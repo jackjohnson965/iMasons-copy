@@ -24,7 +24,7 @@ function App() {
       <BrowserRouter>
         <div className="min-h-screen bg-brand-dark text-white">
           <Navbar />
-          <main className="w-full pt-16">
+          <main className="w-full pt-14">
             <Routes>
               {/* Public routes */}
               <Route path="/" element={<HomePage />} />

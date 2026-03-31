@@ -12,11 +12,20 @@
   /* Dark variant — used for hero backgrounds and dark panels */
   --color-brand-purple-dark:   #4A0A4E;
 
+  /* Light variant — hover states, subtle backgrounds */
+  --color-brand-purple-light:  #7B2D8E;
+
   /* Secondary — dark slate teal ("Foundation" wordmark, sub-headings) */
   --color-brand-teal:          #1E5C6C;
 
   /* Accent — electric cyan (logo bottom dash, active states, highlights) */
   --color-brand-cyan:          #50ECEC;
+
+  /* High-saturation accent highlights (iMasons accent style) */
+  --color-accent-green:        #00E676;
+  --color-accent-amber:        #FFB300;
+  --color-accent-rose:         #FF4081;
+  --color-accent-blue:         #448AFF;
 
   /* Light page background — kept for legacy/auth use */
   --color-brand-bg:            #F8F5FA;
@@ -29,6 +38,9 @@
 
   /* Dark theme — elevated surfaces (inputs, table headers) */
   --color-brand-dark-elevated: #1F1F1F;
+
+  /* Dark theme — subtle surface for hover states */
+  --color-brand-dark-hover:    #252525;
 
   /* Typography — Poppins loaded via Google Fonts in index.html */
   --font-family-sans: 'Poppins', ui-sans-serif, system-ui, sans-serif;
@@ -44,3 +56,9 @@ body {
 html {
   scroll-behavior: smooth;
 }
+
+/* Custom scrollbar for dark theme */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #0A0A0A; }
+::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #555; }
