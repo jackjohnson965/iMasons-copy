@@ -5,6 +5,7 @@ import { useRole } from '../context/RoleContext';
 import { api } from '../api';
 import JobCard from '../components/JobCard';
 import PillarCard from '../components/PillarCard';
+import Skeleton from '../components/Skeleton';
 
 const inputCls = 'w-full bg-brand-dark-elevated border border-white/10 text-white placeholder:text-white/30 rounded-lg px-3 py-2.5 focus:ring-2 focus:ring-brand-cyan focus:border-brand-cyan outline-none transition-colors text-sm';
 const labelCls = 'block text-sm font-medium text-white/50 mb-1.5';
@@ -241,9 +242,10 @@ export default function StudentDashboardPage() {
           </Link>
         </div>
         {savedLoading ? (
-          <div className="flex items-center justify-center py-12 gap-3">
-            <div className="w-6 h-6 border-2 border-brand-purple border-t-brand-cyan rounded-full animate-spin" />
-            <span className="text-white/40 text-sm">Loading saved jobs...</span>
+          <div className="space-y-3">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <Skeleton.JobCard key={i} />
+            ))}
           </div>
         ) : saved?.length > 0 ? (
           <div className="space-y-3">

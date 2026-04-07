@@ -11,8 +11,15 @@ function DropdownMenu({ label, items, currentPath }) {
     const handleClick = (e) => {
       if (ref.current && !ref.current.contains(e.target)) setOpen(false);
     };
+    const handleKey = (e) => {
+      if (e.key === 'Escape') setOpen(false);
+    };
     document.addEventListener('mousedown', handleClick);
-    return () => document.removeEventListener('mousedown', handleClick);
+    document.addEventListener('keydown', handleKey);
+    return () => {
+      document.removeEventListener('mousedown', handleClick);
+      document.removeEventListener('keydown', handleKey);
+    };
   }, []);
 
   const isActive = items.some((item) => currentPath.startsWith(item.to));
@@ -31,7 +38,7 @@ function DropdownMenu({ label, items, currentPath }) {
         </svg>
       </button>
       {open && (
-        <div className="absolute top-full left-0 mt-2 w-52 bg-brand-dark-card border border-white/10 rounded-lg shadow-2xl overflow-hidden z-50">
+        <div className="absolute top-full left-0 mt-2 w-52 bg-brand-dark-card border border-white/[0.08] rounded-xl shadow-2xl overflow-hidden z-50 animate-dropdown-in">
           {items.map((item) => (
             <Link
               key={item.to}

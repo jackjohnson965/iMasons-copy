@@ -62,3 +62,25 @@ html {
 ::-webkit-scrollbar-track { background: #0A0A0A; }
 ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: #555; }
+
+/* Dropdown entrance animation */
+@keyframes dropdown-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-dropdown-in {
+  animation: dropdown-in 0.15s ease-out;
+}
+
+/*
+ * Spacing Scale Reference (8pt grid):
+ *   4px  = p-1,  gap-1
+ *   8px  = p-2,  gap-2
+ *   12px = p-3,  gap-3
+ *   16px = p-4,  gap-4
+ *   24px = p-6,  gap-6
+ *   32px = p-8,  gap-8
+ *   40px = p-10, gap-10
+ *   48px = p-12
+ *   64px = p-16
+ */
