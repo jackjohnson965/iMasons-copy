@@ -42,52 +42,54 @@ export default function LoginPage() {
         </div>
 
         {/* Card */}
-        <div className="bg-brand-dark-card border border-white/10 rounded-2xl overflow-hidden w-full">
-          {/* Cyan accent top border */}
-          <div className="h-1 bg-brand-cyan" />
+        <div className="bg-brand-dark-card border border-white/[0.06] rounded-2xl overflow-hidden w-full">
+          <div className="h-1 bg-gradient-to-r from-brand-purple via-brand-cyan to-brand-teal" />
 
           <div className="p-8">
             <h1 className="text-2xl font-bold text-white mb-1">Welcome back</h1>
-            <p className="text-white/50 text-sm mb-6">Sign in to your iMasons account</p>
+            <p className="text-white/40 text-sm mb-8">Sign in to your iMasons account</p>
 
             {error && (
-              <div className="bg-red-500/10 border border-red-500/30 text-red-400 p-3 rounded-lg mb-4 text-sm">{error}</div>
+              <div className="bg-accent-rose/10 border border-accent-rose/30 text-accent-rose p-3 rounded-lg mb-6 text-sm">{error}</div>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-5">
               <div>
-                <label className="block text-sm font-medium text-white/60 mb-1">Email</label>
+                <label className="block text-sm font-medium text-white/50 mb-1.5">Email</label>
                 <input
                   type="email"
                   value={form.email}
                   onChange={(e) => setForm({ ...form, email: e.target.value })}
                   required
                   autoComplete="email"
-                  className="w-full bg-brand-dark-elevated border border-white/10 text-white placeholder:text-white/30 rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-brand-cyan focus:border-brand-cyan outline-none transition-colors"
+                  className="w-full bg-brand-dark-elevated border border-white/10 text-white placeholder:text-white/30 rounded-lg px-3 py-2.5 text-sm focus:ring-2 focus:ring-brand-cyan focus:border-brand-cyan outline-none transition-colors"
                   placeholder="you@example.com"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-white/60 mb-1">Password</label>
+                <label className="block text-sm font-medium text-white/50 mb-1.5">Password</label>
                 <input
                   type="password"
                   value={form.password}
                   onChange={(e) => setForm({ ...form, password: e.target.value })}
                   required
                   autoComplete="current-password"
-                  className="w-full bg-brand-dark-elevated border border-white/10 text-white placeholder:text-white/30 rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-brand-cyan focus:border-brand-cyan outline-none transition-colors"
+                  className="w-full bg-brand-dark-elevated border border-white/10 text-white placeholder:text-white/30 rounded-lg px-3 py-2.5 text-sm focus:ring-2 focus:ring-brand-cyan focus:border-brand-cyan outline-none transition-colors"
                 />
               </div>
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-brand-purple hover:bg-brand-purple-dark text-white font-semibold py-2.5 rounded-xl transition-colors disabled:opacity-50 mt-2"
+                className="w-full bg-brand-purple hover:bg-brand-purple-light text-white font-semibold py-3 rounded-lg transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
               >
+                {loading && (
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                )}
                 {loading ? 'Signing in...' : 'Sign In'}
               </button>
             </form>
 
-            <p className="text-center text-sm text-white/40 mt-6">
+            <p className="text-center text-sm text-white/30 mt-8">
               Don't have an account?{' '}
               <Link to="/register" className="text-brand-cyan font-semibold hover:text-white transition-colors">
                 Register
@@ -96,7 +98,7 @@ export default function LoginPage() {
           </div>
         </div>
 
-        <p className="text-white/20 text-xs text-center mt-4">
+        <p className="text-white/15 text-xs text-center mt-6">
           Secure access for iMasons members only
         </p>
       </div>

@@ -2,20 +2,8 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useRole } from '../context/RoleContext';
 import PillarCard from '../components/PillarCard';
+import Footer from '../components/Footer';
 import { useFetch } from '../hooks/useFetch';
-
-const footerLinks = (
-  <div className="bg-brand-dark border-t border-white/5 py-6">
-    <div className="max-w-7xl mx-auto px-6 flex flex-wrap justify-between items-center gap-4">
-      <p className="text-white/20 text-sm">iMasons Foundation · Shaping the Digital Future for All</p>
-      <div className="flex gap-6 text-sm text-white/40">
-        <a href="https://imasons.org/" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">iMasons Foundation</a>
-        <a href="https://www.linkedin.com/company/infrastructure-masons/" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">LinkedIn</a>
-        <a href="https://imasons.org/privacy-policy/" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Privacy Policy</a>
-      </div>
-    </div>
-  </div>
-);
 
 /* ─── SVG icon helpers ─── */
 const icons = {
@@ -295,7 +283,7 @@ function AuthenticatedDashboard() {
       </section>
 
       <div className="flex-1" />
-      {footerLinks}
+      <Footer />
     </div>
   );
 }
@@ -415,7 +403,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {footerLinks}
+      <Footer />
     </div>
   );
 }
