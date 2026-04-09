@@ -111,6 +111,23 @@ function StudentCardSkeleton({ className = '' }) {
   );
 }
 
+function CompanyCardSkeleton({ className = '' }) {
+  return (
+    <div className={`bg-brand-dark-card border border-white/[0.06] rounded-xl p-5 border-l-[3px] border-l-white/[0.06] ${className}`}>
+      <div className="flex items-start gap-3">
+        <Circle size="w-10 h-10" />
+        <div className="flex-1 space-y-2">
+          <Line w="w-36" h="h-5" />
+          <Line w="w-24" h="h-3" />
+          <Line w="w-32" h="h-3" />
+          <Line w="w-full" h="h-3" />
+          <Line w="w-2/3" h="h-3" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function ResourceCardSkeleton({ className = '' }) {
   return (
     <div className={`bg-brand-dark-card border border-white/[0.06] rounded-xl p-6 space-y-3 ${className}`}>
@@ -131,6 +148,7 @@ const Skeleton = {
   PillarGrid,
   JobCard: JobCardSkeleton,
   StudentCard: StudentCardSkeleton,
+  CompanyCard: CompanyCardSkeleton,
   ResourceCard: ResourceCardSkeleton,
 };
 

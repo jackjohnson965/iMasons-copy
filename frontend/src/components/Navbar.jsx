@@ -77,6 +77,7 @@ export default function Navbar() {
     { to: '/jobs', label: 'Browse Jobs', description: 'Search open positions' },
     { to: '/mentors', label: 'Mentorships', description: 'Find a mentor' },
     { to: '/students', label: 'Student Directory', description: 'Discover talent' },
+    { to: '/companies', label: 'Company Directory', description: 'Explore companies' },
     { to: '/resources', label: 'Resources', description: 'Guides & tools' },
   ];
 

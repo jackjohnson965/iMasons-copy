@@ -10,6 +10,8 @@ import StudentProfilePage from './pages/StudentProfilePage';
 import StudentProfileViewPage from './pages/StudentProfileViewPage';
 import StudentDashboardPage from './pages/StudentDashboardPage';
 import StudentListPage from './pages/StudentListPage';
+import CompanyListPage from './pages/CompanyListPage';
+import CompanyProfileViewPage from './pages/CompanyProfileViewPage';
 import JobListPage from './pages/JobListPage';
 import MentorListPage from './pages/MentorListPage';
 import JobDetailPage from './pages/JobDetailPage';
@@ -44,6 +46,8 @@ function AppLayout() {
           <Route path="/student/dashboard" element={<ProtectedRoute><StudentDashboardPage /></ProtectedRoute>} />
           <Route path="/student/dashboard/:id" element={<ProtectedRoute><StudentDashboardPage /></ProtectedRoute>} />
           <Route path="/students" element={<ProtectedRoute><StudentListPage /></ProtectedRoute>} />
+          <Route path="/companies" element={<ProtectedRoute><CompanyListPage /></ProtectedRoute>} />
+          <Route path="/companies/:id" element={<ProtectedRoute><CompanyProfileViewPage /></ProtectedRoute>} />
           <Route path="/jobs" element={<ProtectedRoute><JobListPage /></ProtectedRoute>} />
           <Route path="/mentors" element={<ProtectedRoute><MentorListPage /></ProtectedRoute>} />
           <Route path="/mentors/new" element={<ProtectedRoute><MentorCreatePage /></ProtectedRoute>} />

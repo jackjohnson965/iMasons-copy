@@ -133,6 +133,21 @@ class EmployerResponse(BaseModel):
     updatedAt: Optional[str] = None
 
 
+class CompanyProfileResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    companyName: str
+    contactEmail: str
+    industry: str
+    location: str
+    description: str
+    websiteUrl: str
+    createdAt: Optional[str] = None
+    updatedAt: Optional[str] = None
+    jobPostings: list["JobPostingListResponse"] = []
+
+
 # --- Custom Question Schemas ---
 
 class CustomQuestionCreate(BaseModel):

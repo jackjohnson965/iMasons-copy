@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, selectinload
 from typing import Optional
 from database import get_db
 from models import Employer
-from schemas import EmployerCreate, EmployerUpdate, EmployerResponse
+from schemas import EmployerCreate, EmployerUpdate, EmployerResponse, JobPostingListResponse, CompanyProfileResponse
 
 router = APIRouter(prefix="/api/employers", tags=["employers"])
 
@@ -39,10 +39,10 @@ def list_employers(
     return query.all()
 
 
-@router.get("/{employer_id}", response_model=EmployerResponse)
+@router.get("/{employer_id}", response_model=CompanyProfileResponse)
 def get_employer(employer_id: int, db: Session = Depends(get_db)):
     """Get a single employer by ID."""
-    employer = db.query(Employer).filter(Employer.id == employer_id).first()
+    employer = db.query(Employer).options(selectinload(Employer.jobPostings)).filter(Employer.id == employer_id).first()
     if not employer:
         raise HTTPException(status_code=404, detail="Employer not found")
     return employer
