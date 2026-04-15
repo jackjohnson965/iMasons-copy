@@ -60,6 +60,7 @@ class StudentCreate(BaseModel):
     location: str = ""
     skills: str = ""
     resumeLink: str = ""
+    profileImageLink: str = ""
     linkedinUrl: str = ""
     githubUrl: str = ""
     portfolioUrl: str = ""
@@ -74,6 +75,7 @@ class StudentUpdate(BaseModel):
     location: Optional[str] = None
     skills: Optional[str] = None
     resumeLink: Optional[str] = None
+    profileImageLink: Optional[str] = None
     linkedinUrl: Optional[str] = None
     githubUrl: Optional[str] = None
     portfolioUrl: Optional[str] = None
@@ -91,6 +93,7 @@ class StudentResponse(BaseModel):
     location: str
     skills: str
     resumeLink: str
+    profileImageLink: str
     linkedinUrl: str
     githubUrl: str
     portfolioUrl: str

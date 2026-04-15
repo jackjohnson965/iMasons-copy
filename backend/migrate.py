@@ -134,6 +134,18 @@ def migrate_resources_table(cursor):
         print("  [resources] Table already exists, skipping.")
 
 
+def migrate_student_profile_image_link(cursor):
+    """Add `profileImageLink` column to students when missing."""
+    if not column_exists(cursor, "students", "profileImageLink"):
+        print("  [students] Adding profileImageLink column...")
+        cursor.execute(
+            "ALTER TABLE students ADD COLUMN profileImageLink TEXT NOT NULL DEFAULT ''"
+        )
+        print("  [students] profileImageLink column added.")
+    else:
+        print("  [students] profileImageLink column already exists, skipping.")
+
+
 def run_migration():
     if not os.path.exists(DB_PATH):
         print(f"Database not found at {DB_PATH}.")
@@ -156,6 +168,9 @@ def run_migration():
         migrate_analytics_events_constraint(cursor)
 
         migrate_resources_table(cursor)
+        conn.commit()
+
+        migrate_student_profile_image_link(cursor)
         conn.commit()
 
         print("\nMigration complete. All steps succeeded.")

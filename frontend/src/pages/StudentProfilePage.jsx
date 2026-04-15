@@ -10,7 +10,7 @@ const labelCls = 'block text-sm font-medium text-white/50 mb-1.5';
 export default function StudentProfilePage() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { setUserId } = useRole();
+  const { setAuth } = useRole();
   const isEdit = Boolean(id);
 
   const [form, setForm] = useState({
@@ -20,11 +20,12 @@ export default function StudentProfilePage() {
     bio: '',
     location: '',
     skills: '',
-    resumeLink: '',
     linkedinUrl: '',
     githubUrl: '',
     portfolioUrl: '',
   });
+  const [resumeFile, setResumeFile] = useState(null);
+  const [profilePhotoFile, setProfilePhotoFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [pageLoading, setPageLoading] = useState(isEdit);
   const [error, setError] = useState(null);
@@ -41,6 +42,97 @@ export default function StudentProfilePage() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
+  const handleResumeChange = (e) => {
+    const file = e.target.files?.[0] || null;
+    if (!file) {
+      setResumeFile(null);
+      return;
+    }
+    if (file.type !== 'application/pdf') {
+      setError('Resume must be a PDF.');
+      e.target.value = '';
+      setResumeFile(null);
+      return;
+    }
+    const maxBytes = 5 * 1024 * 1024;
+    if (file.size > maxBytes) {
+      setError('Resume too large (max 5 MB).');
+      e.target.value = '';
+      setResumeFile(null);
+      return;
+    }
+    setResumeFile(file);
+  };
+
+  const handleProfilePhotoChange = (e) => {
+    const file = e.target.files?.[0] || null;
+    if (!file) {
+      setProfilePhotoFile(null);
+      return;
+    }
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+    if (!allowedTypes.includes(file.type)) {
+      setError('Profile photo must be a JPG, PNG, or WebP image.');
+      e.target.value = '';
+      setProfilePhotoFile(null);
+      return;
+    }
+    const maxBytes = 5 * 1024 * 1024;
+    if (file.size > maxBytes) {
+      setError('Profile photo too large (max 5 MB).');
+      e.target.value = '';
+      setProfilePhotoFile(null);
+      return;
+    }
+    setProfilePhotoFile(file);
+  };
+
+  const uploadResume = async (studentId, file) => {
+    const token = localStorage.getItem('token');
+    if (!token) throw new Error('Not authenticated');
+    const fd = new FormData();
+    fd.append('resume', file);
+    const res = await fetch(`/api/students/${studentId}/resume`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: fd,
+    });
+    if (!res.ok) {
+      let detail = 'Failed to upload resume';
+      try {
+        const data = await res.json();
+        detail = data?.detail || detail;
+      } catch {}
+      const err = new Error(detail);
+      err.status = res.status;
+      throw err;
+    }
+    return res.json();
+  };
+
+  const uploadProfilePhoto = async (studentId, file) => {
+    const token = localStorage.getItem('token');
+    if (!token) throw new Error('Not authenticated');
+    const fd = new FormData();
+    fd.append('profile_photo', file);
+    const res = await fetch(`/api/students/${studentId}/profile-photo`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: fd,
+    });
+    if (!res.ok) {
+      let detail = 'Failed to upload profile photo';
+      try {
+        const data = await res.json();
+        detail = data?.detail || detail;
+      } catch {}
+      const err = new Error(detail);
+      err.status = res.status;
+      throw err;
+    }
+    return res.json();
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -48,14 +140,27 @@ export default function StudentProfilePage() {
     try {
       if (isEdit) {
         await api.put(`/students/${id}`, form);
+        if (resumeFile) {
+          await uploadResume(id, resumeFile);
+        }
+        if (profilePhotoFile) {
+          await uploadProfilePhoto(id, profilePhotoFile);
+        }
         navigate(`/student/dashboard/${id}`);
       } else {
         const student = await api.post('/students', form);
-        setUserId(student.id);
+        const linkRes = await api.post(`/auth/link-profile/${student.id}`, {});
+        setAuth(linkRes);
+        if (resumeFile) {
+          await uploadResume(student.id, resumeFile);
+        }
+        if (profilePhotoFile) {
+          await uploadProfilePhoto(student.id, profilePhotoFile);
+        }
         navigate(`/student/dashboard/${student.id}`);
       }
     } catch (err) {
-      setError(err.data?.detail || 'Failed to save profile');
+      setError(err.data?.detail || err.message || 'Failed to save profile');
     } finally {
       setLoading(false);
     }
@@ -134,8 +239,27 @@ export default function StudentProfilePage() {
                   <input name="skills" value={form.skills || ''} onChange={handleChange} className={inputCls} placeholder="e.g., Python, React, SQL (comma-separated)" />
                 </div>
                 <div>
-                  <label className={labelCls}>Resume Link</label>
-                  <input name="resumeLink" value={form.resumeLink || ''} onChange={handleChange} className={inputCls} placeholder="Link to your resume (Google Drive, etc.)" />
+                  <label className={labelCls}>Profile Photo</label>
+                  <input
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp"
+                    onChange={handleProfilePhotoChange}
+                    className={inputCls}
+                  />
+                  <p className="text-white/30 text-xs mt-1">JPG, PNG, or WebP. Max 5 MB.</p>
+                  {isEdit && form.profileImageLink && !profilePhotoFile && (
+                    <p className="text-white/50 text-xs mt-1">Current profile photo is set. Choose a new file to replace it.</p>
+                  )}
+                </div>
+                <div>
+                  <label className={labelCls}>Resume (PDF)</label>
+                  <input
+                    type="file"
+                    accept="application/pdf,.pdf"
+                    onChange={handleResumeChange}
+                    className={inputCls}
+                  />
+                  <p className="text-white/30 text-xs mt-1">PDF only. Max 5 MB.</p>
                 </div>
 
                 {/* Social links section */}

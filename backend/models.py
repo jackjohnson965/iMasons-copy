@@ -40,6 +40,7 @@ class Student(Base):
     location = Column(Text, default="")
     skills = Column(Text, default="")
     resumeLink = Column(Text, default="")
+    profileImageLink = Column(Text, default="")
     linkedinUrl = Column(Text, default="")
     githubUrl = Column(Text, default="")
     portfolioUrl = Column(Text, default="")

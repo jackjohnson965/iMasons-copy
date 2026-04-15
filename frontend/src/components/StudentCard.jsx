@@ -1,17 +1,66 @@
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import SkillTag from './SkillTag';
 
 export default function StudentCard({ student }) {
   const skills = student.skills ? student.skills.split(',').map((s) => s.trim()).filter(Boolean) : [];
   const initials = [student.firstName?.[0], student.lastName?.[0]].filter(Boolean).join('').toUpperCase();
+  const [profilePhotoUrl, setProfilePhotoUrl] = useState('');
+
+  useEffect(() => {
+    let cancelled = false;
+    let objectUrl = '';
+
+    const loadProfilePhoto = async () => {
+      const link = student?.profileImageLink;
+      if (!link) {
+        setProfilePhotoUrl('');
+        return;
+      }
+      const token = localStorage.getItem('token');
+      if (!token) {
+        setProfilePhotoUrl('');
+        return;
+      }
+      try {
+        const res = await fetch(link, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!res.ok) {
+          setProfilePhotoUrl('');
+          return;
+        }
+        const blob = await res.blob();
+        objectUrl = window.URL.createObjectURL(blob);
+        if (!cancelled) {
+          setProfilePhotoUrl(objectUrl);
+        }
+      } catch {
+        if (!cancelled) setProfilePhotoUrl('');
+      }
+    };
+
+    loadProfilePhoto();
+    return () => {
+      cancelled = true;
+      if (objectUrl) window.URL.revokeObjectURL(objectUrl);
+    };
+  }, [student?.profileImageLink]);
 
   return (
     <div className="bg-brand-dark-card border border-white/[0.06] rounded-xl p-5 hover:border-white/15 transition-all border-l-[3px] border-l-brand-purple/40 group">
       <div className="flex items-start gap-3">
-        {/* Initials avatar */}
-        <div className="w-10 h-10 rounded-full bg-brand-purple/20 flex items-center justify-center text-sm font-bold text-brand-cyan shrink-0">
-          {initials}
-        </div>
+        {profilePhotoUrl ? (
+          <img
+            src={profilePhotoUrl}
+            alt={`${student.firstName} ${student.lastName}`}
+            className="w-10 h-10 rounded-full object-cover border border-white/10 shrink-0"
+          />
+        ) : (
+          <div className="w-10 h-10 rounded-full bg-brand-purple/20 flex items-center justify-center text-sm font-bold text-brand-cyan shrink-0">
+            {initials}
+          </div>
+        )}
 
         <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between gap-2">
