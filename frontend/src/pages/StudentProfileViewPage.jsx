@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useFetch } from '../hooks/useFetch';
 import { useRole } from '../context/RoleContext';
@@ -9,6 +9,7 @@ export default function StudentProfileViewPage() {
   const { id } = useParams();
   const { role } = useRole();
   const { data: student, loading } = useFetch(`/students/${id}`);
+  const [profilePhotoUrl, setProfilePhotoUrl] = useState('');
 
   useEffect(() => {
     if (id && role) {
@@ -19,6 +20,77 @@ export default function StudentProfileViewPage() {
       }).catch(() => {});
     }
   }, [id, role]);
+
+  useEffect(() => {
+    let cancelled = false;
+    let objectUrl = '';
+
+    const loadProfilePhoto = async () => {
+      if (!student?.profileImageLink) {
+        setProfilePhotoUrl('');
+        return;
+      }
+      const token = localStorage.getItem('token');
+      if (!token) {
+        setProfilePhotoUrl('');
+        return;
+      }
+      try {
+        const res = await fetch(student.profileImageLink, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!res.ok) {
+          setProfilePhotoUrl('');
+          return;
+        }
+        const blob = await res.blob();
+        objectUrl = window.URL.createObjectURL(blob);
+        if (!cancelled) {
+          setProfilePhotoUrl(objectUrl);
+        }
+      } catch {
+        if (!cancelled) {
+          setProfilePhotoUrl('');
+        }
+      }
+    };
+
+    loadProfilePhoto();
+    return () => {
+      cancelled = true;
+      if (objectUrl) {
+        window.URL.revokeObjectURL(objectUrl);
+      }
+    };
+  }, [student?.profileImageLink]);
+
+  const handleResumeDownload = async () => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      alert('Please log in to view resumes.');
+      return;
+    }
+    try {
+      const res = await fetch(`/api/students/${id}/resume/download`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) {
+        let detail = 'Failed to download resume';
+        try {
+          const data = await res.json();
+          detail = data?.detail || detail;
+        } catch {}
+        alert(detail);
+        return;
+      }
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      window.open(url, '_blank', 'noopener,noreferrer');
+      setTimeout(() => window.URL.revokeObjectURL(url), 60_000);
+    } catch {
+      alert('Failed to download resume');
+    }
+  };
 
   if (loading) {
     return (
@@ -71,9 +143,17 @@ export default function StudentProfileViewPage() {
 
         {/* Profile header */}
         <div className="bg-gradient-to-br from-brand-purple-dark to-brand-purple rounded-2xl p-6 mb-4 text-white">
-          <div className="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center text-2xl font-bold text-white mb-4">
-            {initials}
-          </div>
+          {profilePhotoUrl ? (
+            <img
+              src={profilePhotoUrl}
+              alt={`${student.firstName} ${student.lastName}`}
+              className="w-16 h-16 rounded-full object-cover border border-white/20 mb-4"
+            />
+          ) : (
+            <div className="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center text-2xl font-bold text-white mb-4">
+              {initials}
+            </div>
+          )}
           <div className="flex items-start justify-between gap-4">
             <div>
               <h1 className="text-2xl font-bold">
@@ -131,12 +211,16 @@ export default function StudentProfileViewPage() {
               <h3 className="text-xs font-semibold uppercase tracking-[0.2em] text-brand-cyan mb-3">Links</h3>
               <div className="space-y-2">
                 {student.resumeLink && (
-                  <a href={student.resumeLink} target="_blank" rel="noreferrer" className="flex items-center gap-2 text-brand-cyan hover:text-white font-medium text-sm transition-colors">
+                  <button
+                    type="button"
+                    onClick={handleResumeDownload}
+                    className="flex items-center gap-2 text-brand-cyan hover:text-white font-medium text-sm transition-colors"
+                  >
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 shrink-0" viewBox="0 0 20 20" fill="currentColor">
                       <path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clipRule="evenodd" />
                     </svg>
                     Resume
-                  </a>
+                  </button>
                 )}
                 {student.linkedinUrl && (
                   <a href={student.linkedinUrl} target="_blank" rel="noreferrer" className="flex items-center gap-2 text-brand-cyan hover:text-white font-medium text-sm transition-colors">
