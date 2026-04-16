@@ -13,6 +13,7 @@ def test_create_job_posting(client, make_employer):
             "location": "Dallas, TX",
             "jobType": "internship",
             "industry": "tech",
+            "applicationUrl": "https://company.com/careers/backend-intern",
             "status": "active",
             "customQuestions": [],
         },
@@ -21,7 +22,8 @@ def test_create_job_posting(client, make_employer):
     body = resp.json()
     assert body["title"] == "Backend Intern"
     assert body["status"] == "active"
-    assert body["isActive"] == 1  # synced from status
+    assert body["isActive"] == 1
+    assert body["applicationUrl"] == "https://company.com/careers/backend-intern"
     assert body["customQuestions"] == []
 
 
@@ -34,16 +36,35 @@ def test_create_job_posting_with_custom_questions(client, make_employer):
             "title": "Frontend Intern",
             "description": "React work",
             "jobType": "internship",
+            "applicationUrl": "https://company.com/apply/frontend",
             "customQuestions": [
-                {"questionText": "Why us?", "questionOrder": 0},
-                {"questionText": "Portfolio?", "questionOrder": 1},
+                {"questionText": "Why are you interested in this role?", "questionOrder": 0},
+                {"questionText": "Share a link to a project you're proud of.", "questionOrder": 1},
+                {"questionText": "What is your expected graduation date?", "questionOrder": 2},
             ],
         },
     )
     assert resp.status_code == 201
     qs = resp.json()["customQuestions"]
-    assert len(qs) == 2
-    assert {q["questionText"] for q in qs} == {"Why us?", "Portfolio?"}
+    assert len(qs) == 3
+    assert qs[0]["questionText"] == "Why are you interested in this role?"
+    assert qs[1]["questionText"] == "Share a link to a project you're proud of."
+    assert qs[2]["questionText"] == "What is your expected graduation date?"
+
+
+def test_create_job_posting_without_application_url(client, make_employer):
+    employer = make_employer()
+    resp = client.post(
+        "/api/job-postings",
+        json={
+            "employerId": employer["id"],
+            "title": "Data Analyst",
+            "description": "Analyze data",
+            "jobType": "full-time",
+        },
+    )
+    assert resp.status_code == 201
+    assert resp.json()["applicationUrl"] == ""
 
 
 def test_create_job_posting_unknown_employer(client):
@@ -75,7 +96,6 @@ def test_create_job_posting_invalid_status(client, make_employer):
 
 
 def test_create_job_posting_invalid_jobtype(client, make_employer):
-    # CheckConstraint on jobType enforces allowed values — IntegrityError surfaces as 500.
     import pytest
     from sqlalchemy.exc import IntegrityError
 
@@ -92,6 +112,35 @@ def test_create_job_posting_invalid_jobtype(client, make_employer):
         )
 
 
+def test_create_job_posting_with_realistic_questions(client, make_employer):
+    employer = make_employer(companyName="Acme Corp")
+    resp = client.post(
+        "/api/job-postings",
+        json={
+            "employerId": employer["id"],
+            "title": "Software Engineering Intern",
+            "description": "Join our engineering team for a 12-week summer internship.",
+            "location": "Austin, TX",
+            "jobType": "internship",
+            "industry": "Technology",
+            "applicationUrl": "https://acme.com/careers/apply/swe-intern-2026",
+            "customQuestions": [
+                {"questionText": "Why are you interested in working at Acme Corp?", "questionOrder": 0},
+                {"questionText": "Describe a technical challenge you overcame and what you learned.", "questionOrder": 1},
+                {"questionText": "Are you authorized to work in the United States?", "questionOrder": 2},
+                {"questionText": "What is your earliest available start date?", "questionOrder": 3},
+            ],
+        },
+    )
+    assert resp.status_code == 201
+    body = resp.json()
+    assert body["applicationUrl"] == "https://acme.com/careers/apply/swe-intern-2026"
+    qs = body["customQuestions"]
+    assert len(qs) == 4
+    assert qs[0]["questionOrder"] == 0
+    assert qs[3]["questionOrder"] == 3
+
+
 def test_list_job_postings_filters(client, make_employer, make_job):
     e1 = make_employer()
     e2 = make_employer()
@@ -99,16 +148,27 @@ def test_list_job_postings_filters(client, make_employer, make_job):
     make_job(employer=e1, title="Go Dev", jobType="part-time", location="NYC", industry="tech")
     make_job(employer=e2, title="Accountant", jobType="full-time", location="Dallas", industry="finance")
 
-    # search
     assert len(client.get("/api/job-postings", params={"search": "Python"}).json()) == 1
-    # location
     assert len(client.get("/api/job-postings", params={"location": "Dallas"}).json()) == 2
-    # jobType
     assert len(client.get("/api/job-postings", params={"jobType": "full-time"}).json()) == 2
-    # industry
     assert len(client.get("/api/job-postings", params={"industry": "tech"}).json()) == 2
-    # employerId
     assert len(client.get("/api/job-postings", params={"employerId": e1["id"]}).json()) == 2
+
+
+def test_list_job_postings_includes_application_url(client, make_employer):
+    employer = make_employer()
+    client.post(
+        "/api/job-postings",
+        json={
+            "employerId": employer["id"],
+            "title": "Test",
+            "description": "Test",
+            "jobType": "internship",
+            "applicationUrl": "https://example.com/apply",
+        },
+    )
+    listings = client.get("/api/job-postings").json()
+    assert listings[0]["applicationUrl"] == "https://example.com/apply"
 
 
 def test_list_job_postings_status_filter(client, make_job):
@@ -138,12 +198,17 @@ def test_get_job_posting_eager_loads_questions(client, make_employer):
             "title": "X",
             "description": "Y",
             "jobType": "internship",
-            "customQuestions": [{"questionText": "Q1"}, {"questionText": "Q2"}],
+            "customQuestions": [
+                {"questionText": "Tell us about yourself and your career goals."},
+                {"questionText": "Do you have experience with cloud platforms (AWS, GCP, Azure)?"},
+            ],
         },
     ).json()
     resp = client.get(f"/api/job-postings/{created['id']}")
     assert resp.status_code == 200
-    assert len(resp.json()["customQuestions"]) == 2
+    qs = resp.json()["customQuestions"]
+    assert len(qs) == 2
+    assert "career goals" in qs[0]["questionText"]
 
 
 def test_get_job_posting_404(client):
@@ -152,16 +217,23 @@ def test_get_job_posting_404(client):
 
 def test_update_job_posting_status_syncs_isactive(client, make_job):
     job = make_job()
-    # active -> closed
     resp = client.put(f"/api/job-postings/{job['id']}", json={"status": "closed"})
     assert resp.status_code == 200
     assert resp.json()["isActive"] == 0
-    # closed -> active
     resp = client.put(f"/api/job-postings/{job['id']}", json={"status": "active"})
     assert resp.json()["isActive"] == 1
-    # active -> archived
     resp = client.put(f"/api/job-postings/{job['id']}", json={"status": "archived"})
     assert resp.json()["isActive"] == 0
+
+
+def test_update_job_posting_application_url(client, make_job):
+    job = make_job()
+    resp = client.put(
+        f"/api/job-postings/{job['id']}",
+        json={"applicationUrl": "https://newurl.com/apply"},
+    )
+    assert resp.status_code == 200
+    assert resp.json()["applicationUrl"] == "https://newurl.com/apply"
 
 
 def test_update_job_posting_invalid_status(client, make_job):
@@ -192,7 +264,6 @@ def test_delete_job_posting_soft_close(client, make_job, db_session):
     resp = client.delete(f"/api/job-postings/{job['id']}")
     assert resp.status_code == 200
     row = db_session.query(JobPosting).filter(JobPosting.id == job["id"]).first()
-    # Row still exists; just marked closed.
     assert row is not None
     assert row.status == "closed"
     assert row.isActive == 0

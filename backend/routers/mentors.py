@@ -38,6 +38,7 @@ def create_mentor_posting(posting: MentorPostingCreate, db: Session = Depends(ge
         location=posting.location,
         jobType="mentorship",
         industry=posting.industry,
+        applicationUrl=posting.applicationUrl,
         status=posting.status,
         isActive=1 if posting.status == "active" else 0,
     )

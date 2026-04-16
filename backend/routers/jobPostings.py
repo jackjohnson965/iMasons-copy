@@ -26,6 +26,7 @@ def create_job_posting(posting: JobPostingCreate, db: Session = Depends(get_db))
         location=posting.location,
         jobType=posting.jobType,
         industry=posting.industry,
+        applicationUrl=posting.applicationUrl,
         status=posting.status,
         isActive=1 if posting.status == "active" else 0,
     )

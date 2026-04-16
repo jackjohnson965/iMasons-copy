@@ -176,6 +176,7 @@ class JobPostingCreate(BaseModel):
     location: str = ""
     jobType: str
     industry: str = ""
+    applicationUrl: str = ""
     status: str = "active"      # replaces isActive; values: active | closed | archived
     customQuestions: list[CustomQuestionCreate] = []
 
@@ -190,6 +191,7 @@ class MentorPostingCreate(BaseModel):
     description: str
     location: str = ""
     industry: str = ""
+    applicationUrl: str = ""
     status: str = "active"      # active | closed | archived
     customQuestions: list[CustomQuestionCreate] = []
 
@@ -200,6 +202,7 @@ class JobPostingUpdate(BaseModel):
     location: Optional[str] = None
     jobType: Optional[str] = None
     industry: Optional[str] = None
+    applicationUrl: Optional[str] = None
     status: Optional[str] = None   # values: active | closed | archived
     isActive: Optional[int] = None  # kept for legacy compatibility
 
@@ -214,6 +217,7 @@ class JobPostingResponse(BaseModel):
     location: str
     jobType: str
     industry: str
+    applicationUrl: str
     isActive: int
     status: str
     createdAt: Optional[str] = None
@@ -231,6 +235,7 @@ class JobPostingListResponse(BaseModel):
     location: str
     jobType: str
     industry: str
+    applicationUrl: str
     isActive: int
     status: str
     createdAt: Optional[str] = None
@@ -315,3 +320,58 @@ class EmployerAnalyticsSummary(BaseModel):
     totalViews: int
     totalEmailClicks: int = 0
     postingBreakdown: list[dict] = []
+
+
+# --- Application Schemas ---
+
+class ApplicationAnswerCreate(BaseModel):
+    questionId: int
+    answerText: str
+
+
+class ApplicationCreate(BaseModel):
+    studentId: int
+    jobPostingId: int
+    answers: list[ApplicationAnswerCreate] = []
+
+
+class ApplicationAnswerResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    applicationId: int
+    questionId: int
+    answerText: str
+
+
+class ApplicationAnswerWithQuestion(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    applicationId: int
+    questionId: int
+    answerText: str
+    question: CustomQuestionResponse
+
+
+class ApplicationResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    studentId: int
+    jobPostingId: int
+    status: str
+    createdAt: Optional[str] = None
+    answers: list[ApplicationAnswerResponse] = []
+
+
+class ApplicationDetailResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    studentId: int
+    jobPostingId: int
+    status: str
+    createdAt: Optional[str] = None
+    answers: list[ApplicationAnswerWithQuestion] = []
+    student: StudentResponse

@@ -81,6 +81,7 @@ class JobPosting(Base):
     isActive = Column(Integer, default=1)
     # Canonical status: active | closed | archived
     status = Column(Text, default="active")
+    applicationUrl = Column(Text, default="")
     createdAt = Column(Text, server_default=NOW)
     updatedAt = Column(Text, server_default=NOW)
 
@@ -119,6 +120,37 @@ class SavedPosting(Base):
 
     student = relationship("Student", back_populates="savedPostings")
     jobPosting = relationship("JobPosting", back_populates="savedPostings")
+
+
+class Application(Base):
+    __tablename__ = "applications"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    studentId = Column(Integer, ForeignKey("students.id", ondelete="CASCADE"), nullable=False)
+    jobPostingId = Column(Integer, ForeignKey("job_postings.id", ondelete="CASCADE"), nullable=False)
+    status = Column(Text, default="submitted")
+    createdAt = Column(Text, server_default=NOW)
+
+    __table_args__ = (
+        UniqueConstraint("studentId", "jobPostingId"),
+        CheckConstraint("status IN ('submitted', 'reviewed', 'accepted', 'rejected')"),
+    )
+
+    student = relationship("Student")
+    jobPosting = relationship("JobPosting")
+    answers = relationship("ApplicationAnswer", back_populates="application", cascade="all, delete-orphan")
+
+
+class ApplicationAnswer(Base):
+    __tablename__ = "application_answers"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    applicationId = Column(Integer, ForeignKey("applications.id", ondelete="CASCADE"), nullable=False)
+    questionId = Column(Integer, ForeignKey("custom_questions.id", ondelete="CASCADE"), nullable=False)
+    answerText = Column(Text, nullable=False)
+
+    application = relationship("Application", back_populates="answers")
+    question = relationship("CustomQuestion")
 
 
 class AnalyticsEvent(Base):
