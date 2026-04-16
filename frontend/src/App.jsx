@@ -19,6 +19,7 @@ import JobCreatePage from './pages/JobCreatePage';
 import MentorCreatePage from './pages/MentorCreatePage';
 import EmployerDashboardPage from './pages/EmployerDashboardPage';
 import AdminDashboardPage from './pages/AdminDashboardPage';
+import ApplicationsPage from './pages/ApplicationsPage';
 import ResourcesPage from './pages/ResourcesPage';
 
 /* Pages that render their own footer (HomePage has it inline) */
@@ -55,6 +56,7 @@ function AppLayout() {
           <Route path="/jobs/new" element={<ProtectedRoute><JobCreatePage /></ProtectedRoute>} />
           <Route path="/jobs/:id" element={<ProtectedRoute><JobDetailPage /></ProtectedRoute>} />
           <Route path="/jobs/:id/edit" element={<ProtectedRoute><JobCreatePage /></ProtectedRoute>} />
+          <Route path="/jobs/:jobId/applications" element={<ProtectedRoute><ApplicationsPage /></ProtectedRoute>} />
           <Route path="/employer/dashboard" element={<ProtectedRoute><EmployerDashboardPage /></ProtectedRoute>} />
           <Route path="/employer/dashboard/:id" element={<ProtectedRoute><EmployerDashboardPage /></ProtectedRoute>} />
 

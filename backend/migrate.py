@@ -146,6 +146,51 @@ def migrate_student_profile_image_link(cursor):
         print("  [students] profileImageLink column already exists, skipping.")
 
 
+def migrate_job_posting_application_url(cursor):
+    """Add `applicationUrl` column to job_postings for external application links."""
+    if not column_exists(cursor, "job_postings", "applicationUrl"):
+        print("  [job_postings] Adding applicationUrl column...")
+        cursor.execute(
+            "ALTER TABLE job_postings ADD COLUMN applicationUrl TEXT NOT NULL DEFAULT ''"
+        )
+        print("  [job_postings] applicationUrl column added.")
+    else:
+        print("  [job_postings] applicationUrl column already exists, skipping.")
+
+
+def migrate_applications_tables(cursor):
+    """Create applications and application_answers tables."""
+    if not table_exists(cursor, "applications"):
+        print("  [applications] Creating applications table...")
+        cursor.execute("""
+            CREATE TABLE applications (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                studentId INTEGER NOT NULL REFERENCES students(id) ON DELETE CASCADE,
+                jobPostingId INTEGER NOT NULL REFERENCES job_postings(id) ON DELETE CASCADE,
+                status TEXT NOT NULL DEFAULT 'submitted' CHECK(status IN ('submitted', 'reviewed', 'accepted', 'rejected')),
+                createdAt TEXT DEFAULT (datetime('now')),
+                UNIQUE(studentId, jobPostingId)
+            )
+        """)
+        print("  [applications] Table created.")
+    else:
+        print("  [applications] Table already exists, skipping.")
+
+    if not table_exists(cursor, "application_answers"):
+        print("  [application_answers] Creating application_answers table...")
+        cursor.execute("""
+            CREATE TABLE application_answers (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                applicationId INTEGER NOT NULL REFERENCES applications(id) ON DELETE CASCADE,
+                questionId INTEGER NOT NULL REFERENCES custom_questions(id) ON DELETE CASCADE,
+                answerText TEXT NOT NULL
+            )
+        """)
+        print("  [application_answers] Table created.")
+    else:
+        print("  [application_answers] Table already exists, skipping.")
+
+
 def run_migration():
     if not os.path.exists(DB_PATH):
         print(f"Database not found at {DB_PATH}.")
@@ -171,6 +216,12 @@ def run_migration():
         conn.commit()
 
         migrate_student_profile_image_link(cursor)
+        conn.commit()
+
+        migrate_job_posting_application_url(cursor)
+        conn.commit()
+
+        migrate_applications_tables(cursor)
         conn.commit()
 
         print("\nMigration complete. All steps succeeded.")

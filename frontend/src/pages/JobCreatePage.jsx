@@ -10,7 +10,7 @@ const labelCls = 'block text-sm font-medium text-white/50 mb-1.5';
 export default function JobCreatePage() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { userId } = useRole();
+  const { linkedProfileId } = useRole();
   const isEdit = Boolean(id);
 
   const [form, setForm] = useState({
@@ -19,6 +19,7 @@ export default function JobCreatePage() {
     location: '',
     jobType: 'internship',
     industry: '',
+    applicationUrl: '',
   });
   const [questions, setQuestions] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -34,6 +35,7 @@ export default function JobCreatePage() {
           location: data.location,
           jobType: data.jobType,
           industry: data.industry,
+          applicationUrl: data.applicationUrl || '',
         });
         setQuestions(data.customQuestions?.map((q) => q.questionText) || []);
       }).catch(() => setError('Failed to load posting')).finally(() => setPageLoading(false));
@@ -62,13 +64,13 @@ export default function JobCreatePage() {
       } else {
         await api.post('/job-postings', {
           ...form,
-          employerId: userId,
+          employerId: linkedProfileId,
           customQuestions: questions
             .filter((q) => q.trim())
             .map((q, i) => ({ questionText: q, questionOrder: i })),
         });
       }
-      navigate(`/employer/dashboard/${userId}`);
+      navigate(`/employer/dashboard/${linkedProfileId}`);
     } catch (err) {
       setError(err.data?.detail || 'Failed to save posting');
     } finally {
@@ -168,6 +170,18 @@ export default function JobCreatePage() {
                     className={inputCls}
                     placeholder="e.g., Technology, Finance"
                   />
+                </div>
+                <div>
+                  <label className={labelCls}>Application URL</label>
+                  <input
+                    name="applicationUrl"
+                    value={form.applicationUrl}
+                    onChange={handleChange}
+                    type="url"
+                    className={inputCls}
+                    placeholder="e.g., https://company.com/careers/apply"
+                  />
+                  <p className="text-white/25 text-xs mt-1">External link where candidates can submit their application</p>
                 </div>
 
                 {/* Custom questions */}

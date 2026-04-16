@@ -260,6 +260,9 @@ export default function EmployerDashboardPage() {
                   </div>
                 </div>
                 <div className="flex items-center gap-3 shrink-0 ml-4">
+                  <Link to={`/jobs/${p.id}/applications`} className="text-sm text-brand-cyan hover:text-white transition-colors font-medium">
+                    Applications
+                  </Link>
                   <Link to={`/jobs/${p.id}/edit`} className="text-sm text-white/50 hover:text-brand-cyan transition-colors">
                     Edit
                   </Link>

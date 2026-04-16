@@ -218,6 +218,37 @@ def make_job(client, make_employer):
 
 
 @pytest.fixture
+def make_application(client, make_student, make_job):
+    def _make(student=None, job=None, answers=None):
+        if student is None:
+            student = make_student()
+        if job is None:
+            job = make_job(
+                customQuestions=[
+                    {"questionText": "Why are you interested?", "questionOrder": 0},
+                    {"questionText": "What is your availability?", "questionOrder": 1},
+                ],
+            )
+        if answers is None:
+            answers = [
+                {"questionId": q["id"], "answerText": f"Answer to Q{i+1}"}
+                for i, q in enumerate(job.get("customQuestions", []))
+            ]
+        resp = client.post(
+            "/api/applications",
+            json={
+                "studentId": student["id"],
+                "jobPostingId": job["id"],
+                "answers": answers,
+            },
+        )
+        assert resp.status_code == 201, resp.text
+        return resp.json()
+
+    return _make
+
+
+@pytest.fixture
 def make_mentor(client, make_employer):
     def _make(employer=None, **overrides):
         if employer is None:
