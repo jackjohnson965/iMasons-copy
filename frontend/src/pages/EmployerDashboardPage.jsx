@@ -9,6 +9,20 @@ import Skeleton from '../components/Skeleton';
 const inputCls = 'w-full bg-brand-dark-elevated border border-white/10 text-white placeholder:text-white/30 rounded-lg px-3 py-2.5 focus:ring-2 focus:ring-brand-cyan focus:border-brand-cyan outline-none transition-colors text-sm';
 const labelCls = 'block text-sm font-medium text-white/50 mb-1.5';
 
+function parseAppTimestamp(createdAt) {
+  if (!createdAt) return null;
+  const normalized = createdAt.includes('T') ? createdAt : createdAt.replace(' ', 'T');
+  const withTimezone = /(?:Z|[+-]\d{2}:\d{2})$/.test(normalized) ? normalized : `${normalized}Z`;
+  const parsed = new Date(withTimezone);
+  return Number.isNaN(parsed.getTime()) ? null : parsed;
+}
+
+function formatAppTimestamp(createdAt) {
+  const parsed = parseAppTimestamp(createdAt);
+  if (!parsed) return 'Unknown time';
+  return parsed.toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' });
+}
+
 export default function EmployerDashboardPage() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -123,7 +137,11 @@ export default function EmployerDashboardPage() {
   const mentorships = postings?.filter((p) => p.jobType === 'mentorship') ?? [];
   const postingTitleById = new Map((postings ?? []).map((p) => [p.id, p.title]));
   const recentlyApplied = [...(applications ?? [])]
-    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+    .sort((a, b) => {
+      const aTime = parseAppTimestamp(a.createdAt)?.getTime() ?? 0;
+      const bTime = parseAppTimestamp(b.createdAt)?.getTime() ?? 0;
+      return bTime - aTime;
+    })
     .slice(0, 8);
 
   return (
@@ -232,7 +250,7 @@ export default function EmployerDashboardPage() {
           </div>
         )}
 
-              {/* Recently applied applicants */}
+        {/* Recently applied applicants */}
         <div className="mb-10">
           <h2 className="text-lg font-bold text-white mb-4">Recently Applied</h2>
           {applicationsLoading ? (
@@ -260,7 +278,7 @@ export default function EmployerDashboardPage() {
                   </div>
                   <div className="shrink-0 text-right">
                     <p className="text-white/60 text-xs">
-                      {new Date(app.createdAt).toLocaleDateString()}
+                      {formatAppTimestamp(app.createdAt)}
                     </p>
                     <p className="text-brand-cyan text-xs font-medium mt-1">View profile →</p>
                   </div>
