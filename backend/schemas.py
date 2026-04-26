@@ -330,7 +330,7 @@ class ApplicationAnswerCreate(BaseModel):
 
 
 class ApplicationCreate(BaseModel):
-    studentId: int
+     studentId: Optional[int] = None
     jobPostingId: int
     answers: list[ApplicationAnswerCreate] = []
 
