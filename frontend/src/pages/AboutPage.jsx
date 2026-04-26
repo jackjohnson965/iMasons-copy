@@ -1,6 +1,7 @@
 const creators = [
   {
     name: 'Adrian Alfonso',
+    photoUrl: '/images/team/adrian-alfonso.jpg',
     role: 'Computer Science Major · Software Engineering Specialization · Data Science Minor',
     skills: ['C++', 'C', 'Java', 'JavaScript', 'React', 'Python', 'Docker', 'Git/GitHub', 'MySQL'],
     highlights: [
@@ -12,6 +13,7 @@ const creators = [
   },
   {
     name: 'Ben King',
+    photoUrl: null,
     role: 'Computer Science Major · Business Minor',
     skills: ['Java', 'Python', 'C/C++', 'JavaScript', 'React', 'Node.js', 'Docker', 'MySQL', 'R', 'Git/GitHub'],
     highlights: [
@@ -23,6 +25,7 @@ const creators = [
   },
   {
     name: 'Eli Chesnut',
+    photoUrl: null,
     role: 'Computer Science Major · AI/ML Specialization · Data Science Minor',
     skills: ['Python', 'C++', 'SQL', 'R', 'Java', 'Docker', 'Jupyter', 'Tableau', 'Git/GitHub'],
     highlights: [
@@ -34,6 +37,7 @@ const creators = [
   },
   {
     name: 'Jack Johnson',
+    photoUrl: '/images/team/jack-johnson.jpg',
     role: 'B.A. in Computer Science & Data Science · Security Specialization · Business Minor ',
     skills: ['Java', 'C/C++', 'SQL', 'Python', 'R', 'MySQL', 'Git/GitHub', 'Linux VMs', 'VS Code'],
     highlights: [
@@ -63,9 +67,17 @@ export default function AboutPage() {
           {creators.map((creator) => (
             <article key={creator.name} className="bg-brand-dark-card border border-white/[0.06] rounded-2xl p-6">
               <div className="flex items-start gap-4">
-                <div className="w-11 h-11 rounded-full bg-brand-purple/25 text-brand-cyan flex items-center justify-center font-bold shrink-0">
-                  {creator.name.split(' ').map((n) => n[0]).join('')}
-                </div>
+                {creator.photoUrl ? (
+                  <img
+                    src={creator.photoUrl}
+                    alt={`${creator.name} headshot`}
+                    className="w-11 h-11 rounded-full object-cover border border-white/15 shrink-0"
+                  />
+                ) : (
+                  <div className="w-11 h-11 rounded-full bg-brand-purple/25 text-brand-cyan flex items-center justify-center font-bold shrink-0">
+                    {creator.name.split(' ').map((n) => n[0]).join('')}
+                  </div>
+                )}
                 <div>
                   <h2 className="text-xl font-bold text-white">{creator.name}</h2>
                   <p className="text-white/50 text-sm mt-1">{creator.role}</p>
