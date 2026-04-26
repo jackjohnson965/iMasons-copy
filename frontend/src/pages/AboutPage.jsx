@@ -34,7 +34,7 @@ const creators = [
   },
   {
     name: 'Jack Johnson',
-    role: 'B.A. in Computer Science & Data Science · Business Minor ',
+    role: 'B.A. in Computer Science & Data Science · Security Specialization · Business Minor ',
     skills: ['Java', 'C/C++', 'SQL', 'Python', 'R', 'MySQL', 'Git/GitHub', 'Linux VMs', 'VS Code'],
     highlights: [
       'Built a private-lending business website and software-focused academic projects.',
