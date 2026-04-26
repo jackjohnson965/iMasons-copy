@@ -14,6 +14,7 @@ export const stores = {
   employers: [],
   jobs: [],
   mentors: [],
+  applications: [],
   saved: [],
   resources: [],
   users: [],
@@ -181,6 +182,26 @@ export const handlers = [
     j.status = 'closed';
     j.isActive = 0;
     return HttpResponse.json({ message: 'Job posting closed' });
+  }),
+
+   // ---- applications ----
+  http.get(`${BASE}/applications`, ({ request }) => {
+    const url = new URL(request.url);
+    const jobPostingId = Number(url.searchParams.get('jobPostingId'));
+    const employerId = Number(url.searchParams.get('employerId'));
+    let rows = stores.applications;
+
+    if (!Number.isNaN(jobPostingId) && jobPostingId > 0) {
+      rows = rows.filter((a) => a.jobPostingId === jobPostingId);
+    }
+    if (!Number.isNaN(employerId) && employerId > 0) {
+      const employerPostingIds = stores.jobs
+        .filter((j) => j.employerId === employerId)
+        .map((j) => j.id);
+      rows = rows.filter((a) => employerPostingIds.includes(a.jobPostingId));
+    }
+
+    return HttpResponse.json(rows);
   }),
 
   // ---- mentors ----
