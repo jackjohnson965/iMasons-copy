@@ -184,7 +184,7 @@ export const handlers = [
     return HttpResponse.json({ message: 'Job posting closed' });
   }),
 
-   // ---- applications ----
+ // ---- applications ----
   http.get(`${BASE}/applications`, ({ request }) => {
     const url = new URL(request.url);
     const jobPostingId = Number(url.searchParams.get('jobPostingId'));
@@ -202,6 +202,33 @@ export const handlers = [
     }
 
     return HttpResponse.json(rows);
+  }),
+  http.post(`${BASE}/applications`, async ({ request }) => {
+    const body = await request.json();
+    const student = stores.students.find((s) => s.id === Number(body.studentId));
+    const posting = stores.jobs.find((j) => j.id === Number(body.jobPostingId));
+    if (!student || !posting) {
+      return HttpResponse.json({ detail: 'Student or posting not found' }, { status: 404 });
+    }
+
+    const dup = stores.applications.find(
+      (a) => a.studentId === Number(body.studentId) && a.jobPostingId === Number(body.jobPostingId),
+    );
+    if (dup) {
+      return HttpResponse.json({ detail: 'Already applied to this posting' }, { status: 409 });
+    }
+
+    const row = {
+      id: nextId(stores.applications),
+      studentId: Number(body.studentId),
+      jobPostingId: Number(body.jobPostingId),
+      status: 'submitted',
+      createdAt: new Date().toISOString(),
+      answers: body.answers || [],
+      student,
+    };
+    stores.applications.push(row);
+    return HttpResponse.json(row, { status: 201 });
   }),
 
   // ---- mentors ----
