@@ -2,7 +2,8 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session, joinedload
 from typing import Optional
 from database import get_db
-from models import Application, ApplicationAnswer, Student, JobPosting
+from auth import get_optional_current_user
+from models import Application, ApplicationAnswer, Student, JobPosting, User
 from schemas import (
     ApplicationCreate,
     ApplicationResponse,
@@ -13,8 +14,23 @@ router = APIRouter(prefix="/api/applications", tags=["applications"])
 
 
 @router.post("", response_model=ApplicationResponse, status_code=201)
-def create_application(body: ApplicationCreate, db: Session = Depends(get_db)):
-    student = db.query(Student).filter(Student.id == body.studentId).first()
+def create_application(
+    body: ApplicationCreate,
+    db: Session = Depends(get_db),
+    current_user: Optional[User] = Depends(get_optional_current_user),
+):
+    resolved_student_id = body.studentId
+    if current_user and current_user.role == "student":
+        # If the token is from a student account, trust the linked profile id.
+        resolved_student_id = current_user.linkedProfileId
+
+    if resolved_student_id is None:
+        raise HTTPException(
+            status_code=422,
+            detail="studentId is required (or authenticate as a linked student account)",
+        )
+
+    student = db.query(Student).filter(Student.id == resolved_student_id).first()
     if not student:
         raise HTTPException(status_code=404, detail="Student not found")
 
@@ -24,14 +40,14 @@ def create_application(body: ApplicationCreate, db: Session = Depends(get_db)):
 
     existing = (
         db.query(Application)
-        .filter(Application.studentId == body.studentId, Application.jobPostingId == body.jobPostingId)
+        .filter(Application.studentId == resolved_student_id, Application.jobPostingId == body.jobPostingId)
         .first()
     )
     if existing:
         raise HTTPException(status_code=409, detail="Already applied to this posting")
 
     application = Application(
-        studentId=body.studentId,
+        studentId=resolved_student_id,
         jobPostingId=body.jobPostingId,
     )
     db.add(application)
