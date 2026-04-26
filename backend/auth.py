@@ -36,6 +36,7 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 # Bearer token extractor — integrates with FastAPI OpenAPI docs (adds Authorize button)
 bearer_scheme = HTTPBearer()
+optional_bearer_scheme = HTTPBearer(auto_error=False)
 
 
 # --- Password utilities ---
@@ -117,6 +118,38 @@ def get_current_user(
     token = credentials.credentials
     payload = decode_access_token(token)
 
+    user_id: str = payload.get("sub")
+    if user_id is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid token payload",
+        )
+
+    user = db.query(User).filter(User.id == int(user_id)).first()
+    if user is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="User not found",
+        )
+
+    return user
+
+def get_optional_current_user(
+    credentials: HTTPAuthorizationCredentials | None = Depends(optional_bearer_scheme),
+    db: Session = Depends(get_db),
+):
+    """
+    Optional-auth variant of get_current_user.
+    Returns None if no Authorization header is present; otherwise enforces
+    normal JWT validity and user existence checks.
+    """
+    from models import User
+
+    if credentials is None:
+        return None
+
+    token = credentials.credentials
+    payload = decode_access_token(token)
     user_id: str = payload.get("sub")
     if user_id is None:
         raise HTTPException(
