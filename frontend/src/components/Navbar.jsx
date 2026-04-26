@@ -131,6 +131,14 @@ export default function Navbar() {
 
         {/* Right: auth controls */}
         <div className="flex items-center gap-3">
+          <Link
+            to="/about"
+            className={`text-sm font-medium px-2 transition-colors ${
+              location.pathname === '/about' ? 'text-brand-cyan' : 'text-white/70 hover:text-white'
+            }`}
+          >
+            About
+          </Link>
           {isAuthenticated ? (
             <>
               <span className="hidden sm:inline-flex text-xs font-semibold capitalize bg-brand-purple/30 text-brand-cyan px-3 py-1 rounded-full border border-brand-purple/40">
