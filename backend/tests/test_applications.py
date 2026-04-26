@@ -177,3 +177,31 @@ def test_update_application_invalid_status(client, make_application):
 def test_update_application_404(client):
     resp = client.put("/api/applications/9999/status?status=reviewed")
     assert resp.status_code == 404
+
+def test_submit_application_uses_student_linked_profile_from_token(
+    client, make_user, make_student, make_job, auth_headers
+):
+    user = make_user(role="student")
+    student = make_student(email=user["email"])
+
+    # Link the newly created student profile to the authenticated user.
+    link_resp = client.post(
+        f"/api/auth/link-profile/{student['id']}",
+        headers=auth_headers(user),
+    )
+    assert link_resp.status_code == 200
+    linked = link_resp.json()
+
+    job = make_job()
+    resp = client.post(
+        "/api/applications",
+        json={
+            # intentionally wrong student id in payload; API should trust token
+            "studentId": 999999,
+            "jobPostingId": job["id"],
+            "answers": [],
+        },
+        headers=auth_headers(linked["access_token"]),
+    )
+    assert resp.status_code == 201
+    assert resp.json()["studentId"] == student["id"]
