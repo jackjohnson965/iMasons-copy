@@ -58,10 +58,12 @@ export default function JobDetailPage() {
     setSubmitting(true);
     setError(null);
     try {
-      const answersList = (job.customQuestions || []).map((q) => ({
-        questionId: q.id,
-        answerText: answers[q.id] || '',
-      }));
+      const answersList = (job.customQuestions || [])
+        .filter((q) => Number.isInteger(Number(q.id)))
+        .map((q) => ({
+          questionId: Number(q.id),
+          answerText: answers[q.id] || '',
+        }));
       await api.post('/applications', {
         studentId: linkedProfileId,
         jobPostingId: Number(id),
