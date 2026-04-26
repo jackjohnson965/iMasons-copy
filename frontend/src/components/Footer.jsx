@@ -15,6 +15,12 @@ export default function Footer() {
             </p>
           </div>
           <div className="flex flex-wrap justify-center gap-6 text-sm text-white/30">
+            <Link
+              to="/about"
+              className="hover:text-white/60 transition-colors"
+            >
+              About the Team
+            </Link>
             <a
               href="https://imasons.org/"
               target="_blank"
