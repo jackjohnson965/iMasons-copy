@@ -121,6 +121,10 @@ export default function EmployerDashboardPage() {
 
   const jobPostings = postings?.filter((p) => p.jobType !== 'mentorship') ?? [];
   const mentorships = postings?.filter((p) => p.jobType === 'mentorship') ?? [];
+  const postingTitleById = new Map((postings ?? []).map((p) => [p.id, p.title]));
+  const recentlyApplied = [...(applications ?? [])]
+    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+    .slice(0, 8);
 
   return (
     <div className="min-h-screen bg-brand-dark">
@@ -227,6 +231,48 @@ export default function EmployerDashboardPage() {
             </div>
           </div>
         )}
+
+              {/* Recently applied applicants */}
+        <div className="mb-10">
+          <h2 className="text-lg font-bold text-white mb-4">Recently Applied</h2>
+          {applicationsLoading ? (
+            <div className="space-y-2">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <Skeleton.Card key={i} />
+              ))}
+            </div>
+          ) : recentlyApplied.length > 0 ? (
+            <div className="bg-brand-dark-card border border-white/[0.06] rounded-xl divide-y divide-white/[0.06]">
+              {recentlyApplied.map((app) => (
+                <Link
+                  key={app.id}
+                  to={`/student/profile/${app.studentId}/view`}
+                  className="p-4 flex items-center justify-between gap-4 hover:bg-white/[0.02] transition-colors"
+                >
+                  <div className="min-w-0">
+                    <p className="font-semibold text-white truncate">
+                      {app.student.firstName} {app.student.lastName}
+                    </p>
+                    <p className="text-white/40 text-sm truncate">{app.student.email}</p>
+                    <p className="text-white/30 text-xs mt-1 truncate">
+                      Applied to: {postingTitleById.get(app.jobPostingId) || `Posting #${app.jobPostingId}`}
+                    </p>
+                  </div>
+                  <div className="shrink-0 text-right">
+                    <p className="text-white/60 text-xs">
+                      {new Date(app.createdAt).toLocaleDateString()}
+                    </p>
+                    <p className="text-brand-cyan text-xs font-medium mt-1">View profile →</p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12 bg-brand-dark-card border border-white/[0.06] rounded-xl">
+              <p className="text-white/30 text-sm">No applicants yet.</p>
+            </div>
+          )}
+        </div>
 
         {/* Job Postings */}
         <div className="flex items-center justify-between mb-4">
