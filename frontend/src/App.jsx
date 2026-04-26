@@ -6,6 +6,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
+import AboutPage from './pages/AboutPage';
 import StudentProfilePage from './pages/StudentProfilePage';
 import StudentProfileViewPage from './pages/StudentProfileViewPage';
 import StudentDashboardPage from './pages/StudentDashboardPage';
@@ -28,7 +29,7 @@ const noGlobalFooter = new Set(['/', '/login', '/register']);
 function AppLayout() {
   const location = useLocation();
   const { isAuthenticated } = useRole();
-  const showFooter = isAuthenticated && !noGlobalFooter.has(location.pathname);
+  const showFooter = !noGlobalFooter.has(location.pathname) && (isAuthenticated || location.pathname === '/about');
 
   return (
     <div className="min-h-screen bg-brand-dark text-white flex flex-col">
@@ -39,6 +40,7 @@ function AppLayout() {
           <Route path="/" element={<HomePage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
+          <Route path="/about" element={<AboutPage />} />
 
           {/* Protected routes — require authentication */}
           <Route path="/student/profile/new" element={<ProtectedRoute><StudentProfilePage /></ProtectedRoute>} />
