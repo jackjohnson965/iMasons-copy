@@ -11,5 +11,7 @@ describe('AboutPage', () => {
     expect(screen.getByText('Ben King')).toBeInTheDocument();
     expect(screen.getByText('Eli Chesnut')).toBeInTheDocument();
     expect(screen.getByText('Jack Johnson')).toBeInTheDocument();
+    expect(screen.getByAltText('Adrian Alfonso headshot')).toBeInTheDocument();
+    expect(screen.getByAltText('Jack Johnson headshot')).toBeInTheDocument();
   });
 });
