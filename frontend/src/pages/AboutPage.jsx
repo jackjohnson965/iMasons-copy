@@ -1,7 +1,7 @@
 const creators = [
   {
     name: 'Adrian Alfonso',
-    photoUrl: '/images/team/adrian-alfonso.jpg',
+    photoUrl: '/images/team/adrian-alfonso.png',
     role: 'Computer Science Major · Software Engineering Specialization · Data Science Minor',
     skills: ['C++', 'C', 'Java', 'JavaScript', 'React', 'Python', 'Docker', 'Git/GitHub', 'MySQL'],
     highlights: [
@@ -37,7 +37,7 @@ const creators = [
   },
   {
     name: 'Jack Johnson',
-    photoUrl: '/images/team/jack-johnson.jpg',
+    photoUrl: '/images/team/jack-johnson.png',
     role: 'B.A. in Computer Science & Data Science · Security Specialization · Business Minor ',
     skills: ['Java', 'C/C++', 'SQL', 'Python', 'R', 'MySQL', 'Git/GitHub', 'Linux VMs', 'VS Code'],
     highlights: [
