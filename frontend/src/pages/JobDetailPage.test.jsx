@@ -20,6 +20,16 @@ function renderDetail(jobId) {
 
 describe('JobDetailPage', () => {
   beforeEach(() => {
+      stores.students.push({
+      id: 5,
+      firstName: 'Test',
+      lastName: 'Student',
+      email: 'student@test.com',
+      skills: 'React',
+      location: 'Austin',
+      bio: '',
+      isActive: 1,
+    });
     stores.jobs.push({
       id: 11,
       title: 'Data Engineer',
@@ -61,7 +71,7 @@ describe('JobDetailPage', () => {
     expect(screen.getByText('We love data')).toBeInTheDocument();
   });
 
-  it('Apply via Email posts an email_click analytics event and opens mailto', async () => {
+  it('submits an application and then opens follow-up email link', async () => {
     const user = userEvent.setup();
     renderDetail(11);
 
@@ -77,12 +87,20 @@ describe('JobDetailPage', () => {
     });
 
     try {
-      const applyBtn = await screen.findByRole('button', { name: /apply via email/i });
+       await user.click(await screen.findByRole('button', { name: /answer questions & apply/i }));
+      const textareas = await screen.findAllByPlaceholderText('Your answer...');
+      await user.type(textareas[0], 'I love this company');
+      await user.type(textareas[1], '3');
+      await user.click(screen.getByRole('button', { name: /submit application/i }));
+      const applyBtn = await screen.findByRole('button', { name: /send follow-up email/i });
       await user.click(applyBtn);
       await new Promise((r) => setTimeout(r, 10));
       expect(hrefSpy).toHaveBeenCalledWith(expect.stringContaining('mailto:hr@pipelines.test'));
       expect(
         stores.analytics.some((e) => e.eventType === 'email_click' && e.targetId === 11),
+      ).toBe(true);
+        expect(
+        stores.applications.some((a) => a.studentId === 5 && a.jobPostingId === 11),
       ).toBe(true);
     } finally {
       Object.defineProperty(window, 'location', {
