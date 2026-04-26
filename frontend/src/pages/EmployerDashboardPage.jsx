@@ -19,6 +19,7 @@ export default function EmployerDashboardPage() {
   const { data: employer, loading: employerLoading } = useFetch(employerId ? `/employers/${employerId}` : null);
   const { data: postings, loading: postingsLoading, refetch: refetchPostings } = useFetch(employerId ? `/job-postings?employerId=${employerId}` : null);
   const { data: analytics } = useFetch(employerId ? `/analytics/employer/${employerId}` : null);
+  const { data: applications, loading: applicationsLoading } = useFetch(employerId ? `/applications?employerId=${employerId}` : null);
 
   const [setupForm, setSetupForm] = useState({
     companyName: '',
